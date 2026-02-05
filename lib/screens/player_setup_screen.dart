@@ -40,6 +40,10 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF16213E),
         title: Text(l.playerSetup, style: const TextStyle(color: Colors.white)),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.white70),

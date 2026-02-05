@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
-import '../models/role.dart';
-import '../widgets/paywall_dialog.dart';
+import '../utils/app_theme.dart';
 import '../utils/localization_helper.dart';
 
 class PlayerSetupScreen extends StatefulWidget {
@@ -14,10 +13,12 @@ class PlayerSetupScreen extends StatefulWidget {
 
 class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
   final TextEditingController _nameController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {
     _nameController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -26,6 +27,7 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     if (name.isNotEmpty) {
       context.read<GameProvider>().addPlayer(name);
       _nameController.clear();
+      _focusNode.requestFocus();
     }
   }
 
@@ -36,168 +38,260 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     final l = LocalizationHelper.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: AppTheme.darkBg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF16213E),
-        title: Text(l.playerSetup, style: const TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.cardBg,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
         ),
+        title: Text(l.playerSetup),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white70),
-            onPressed: () => Navigator.pushNamed(context, '/settings'),
+          Container(
+            margin: const EdgeInsets.only(right: AppTheme.spacingSm),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceBg.withOpacity(0.5),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.settings_outlined, size: 22),
+              onPressed: () => Navigator.pushNamed(context, '/settings'),
+            ),
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppTheme.spacingLg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Player count card
+                  _buildPlayerCountCard(players.length, l),
+                  const SizedBox(height: AppTheme.spacingLg),
+                  // Add player input
+                  _buildAddPlayerCard(l),
+                  const SizedBox(height: AppTheme.spacingLg),
+                  // Player list
+                  if (players.isNotEmpty) ...[
                     Text(
-                      l.enterPlayerCount,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
+                      'OYUNCULAR',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 2,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _nameController,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              hintText: l.playerName,
-                              hintStyle: const TextStyle(color: Colors.white38),
-                              filled: true,
-                              fillColor: const Color(0xFF0F3460),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            onSubmitted: (_) => _addPlayer(),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: _addPlayer,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE94560),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 16,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Text(
-                            l.addPlayer,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: AppTheme.spacingSm),
+                    ...players.asMap().entries.map((entry) => 
+                      _buildPlayerCard(entry.key + 1, entry.value, gameProvider)
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l.playersCount(players.length),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ...players.map((player) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0F3460),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.person,
-                                color: Colors.white70,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  player.name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () {
-                                  gameProvider.removePlayer(player.id);
-                                },
-                              ),
-                            ],
-                          ),
-                        )),
                   ],
-                ),
+                ],
               ),
             ),
-            if (gameProvider.adsEnabled) _buildAdBanner(),
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: ElevatedButton(
-                onPressed: players.length >= 3
-                    ? () => Navigator.pushNamed(context, '/role-setup')
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE94560),
-                  disabledBackgroundColor: Colors.grey,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+          ),
+          // Bottom CTA
+          _buildBottomCTA(players.length, l),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerCountCard(int count, LocalizationHelper l) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingLg),
+      decoration: BoxDecoration(
+        gradient: AppTheme.cardGradient,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'TOPLAM OYUNCU',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+              letterSpacing: 2,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingSm),
+          Text(
+            '$count',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingXs),
+          Text(
+            count < 3 ? 'En az 3 oyuncu gerekli' : 'Oyuncu ekleyebilirsiniz',
+            style: TextStyle(
+              color: count < 3 ? Colors.orange : Colors.green,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddPlayerCard(LocalizationHelper l) {
+    return Container(
+      padding: const EdgeInsets.all(AppTheme.spacingMd),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBg,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _nameController,
+              focusNode: _focusNode,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+              decoration: InputDecoration(
+                hintText: l.playerName,
+                prefixIcon: Icon(
+                  Icons.person_add_outlined,
+                  color: Colors.white.withOpacity(0.5),
                 ),
-                child: Text(
-                  l.continueButton,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                filled: true,
+                fillColor: AppTheme.surfaceBg,
+              ),
+              onSubmitted: (_) => _addPlayer(),
+              textCapitalization: TextCapitalization.words,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingSm),
+          Container(
+            decoration: BoxDecoration(
+              color: AppTheme.primaryRed,
+              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryRed.withOpacity(0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
                 ),
+              ],
+            ),
+            child: IconButton(
+              onPressed: _addPlayer,
+              icon: const Icon(Icons.add, color: Colors.white),
+              iconSize: 28,
+              padding: const EdgeInsets.all(AppTheme.spacingSm),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerCard(int index, player, GameProvider gameProvider) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingSm),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceBg,
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.05),
+        ),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.spacingMd,
+          vertical: AppTheme.spacingXs,
+        ),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: AppTheme.darkPurple.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          ),
+          child: Center(
+            child: Text(
+              '$index',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
-          ],
+          ),
+        ),
+        title: Text(
+          player.name,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: IconButton(
+          onPressed: () => gameProvider.removePlayer(player.id),
+          icon: Icon(
+            Icons.remove_circle_outline,
+            color: Colors.red.withOpacity(0.8),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAdBanner() {
+  Widget _buildBottomCTA(int playerCount, LocalizationHelper l) {
+    final canContinue = playerCount >= 3;
+
     return Container(
-      height: 50,
-      color: const Color(0xFF16213E),
-      child: const Center(
+      padding: EdgeInsets.only(
+        left: AppTheme.spacingLg,
+        right: AppTheme.spacingLg,
+        top: AppTheme.spacingMd,
+        bottom: MediaQuery.of(context).padding.bottom + AppTheme.spacingMd,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBg,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: canContinue
+            ? () => Navigator.pushNamed(context, '/role-setup')
+            : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: canContinue ? AppTheme.primaryRed : Colors.grey.shade700,
+          disabledBackgroundColor: Colors.grey.shade800,
+          minimumSize: const Size(double.infinity, AppTheme.buttonHeightLg),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+          ),
+          elevation: canContinue ? 4 : 0,
+        ),
         child: Text(
-          'Ad Banner Placeholder',
-          style: TextStyle(color: Colors.white38),
+          l.continueButton.toUpperCase(),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+            color: canContinue ? Colors.white : Colors.white38,
+          ),
         ),
       ),
     );

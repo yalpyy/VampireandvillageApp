@@ -35,6 +35,19 @@ class SoundService {
     await _playSound('game_end.mp3');
   }
 
+  // New sounds for moderator mode
+  Future<void> playWolfHowl() async {
+    await _playSound('wolf_howl.mp3');
+  }
+
+  Future<void> playRooster() async {
+    await _playSound('rooster.mp3');
+  }
+
+  Future<void> playTimesUp() async {
+    await _playSound('times_up.mp3');
+  }
+
   Future<void> _playSound(String fileName) async {
     if (!_isEnabled) return;
 

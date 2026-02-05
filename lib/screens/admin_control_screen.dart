@@ -42,9 +42,10 @@ class AdminControlScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Gece: ${gameProvider.state.nightCount + 1}',
-                style: const TextStyle(
+              const Text(
+                'Moderatör ekranına geçmeye hazırsınız',
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: Colors.white70,
                   fontSize: 16,
                 ),
@@ -54,28 +55,25 @@ class AdminControlScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (gameProvider.soundEnabled) {
-                      SoundService().playNightStart();
-                    }
-                    gameProvider.startNight();
-                    Navigator.pushReplacementNamed(context, '/night');
+                    // Go to moderator screen instead of night screen
+                    Navigator.pushReplacementNamed(context, '/moderator');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4A148C),
+                    backgroundColor: const Color(0xFFE94560),
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.nightlight_round,
+                      Icon(Icons.admin_panel_settings,
                           color: Colors.white, size: 28),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Text(
-                        l.startNight,
-                        style: const TextStyle(
+                        'Moderatör Ekranına Geç',
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

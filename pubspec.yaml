@@ -32,9 +32,3 @@ flutter:
     - assets/sounds/
     - assets/icons/
 
-  fonts:
-    - family: GameFont
-      fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700

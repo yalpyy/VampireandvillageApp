@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/game_provider.dart';
 
 class LocalizationHelper {
   final BuildContext context;
@@ -7,6 +9,14 @@ class LocalizationHelper {
 
   static LocalizationHelper of(BuildContext context) {
     return LocalizationHelper._(context);
+  }
+
+  String get locale {
+    try {
+      return context.read<GameProvider>().locale;
+    } catch (_) {
+      return 'tr';
+    }
   }
 
   // Since flutter_localizations requires running flutter gen-l10n,

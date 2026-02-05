@@ -2,7 +2,7 @@ name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -27,10 +27,10 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install deps
+      - name: Flutter pub get
         run: flutter pub get
 
-      # Eğer repo altında /web varsa otomatik var sayıyoruz
+      # Web build (GitHub Pages için base-href kritik)
       - name: Build web
         run: flutter build web --release --base-href "/${{ github.event.repository.name }}/"
 
@@ -40,12 +40,12 @@ jobs:
           path: build/web
 
   deploy:
+    runs-on: ubuntu-latest
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

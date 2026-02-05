@@ -107,5 +107,6 @@ class GameState {
     currentRevealIndex = 0;
     nightCount = 0;
     winner = null;
+    isNightPhase = false;
   }
 }

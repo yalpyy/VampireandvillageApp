@@ -8,3 +8,6 @@ export 'vote_screen.dart';
 export 'result_screen.dart';
 export 'settings_screen.dart';
 export 'about_screen.dart';
+export 'home_screen.dart';
+export 'terms_screen.dart';
+export 'moderator_screen.dart';

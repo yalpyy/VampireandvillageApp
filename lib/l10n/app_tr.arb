@@ -1,0 +1,126 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Vampir Partisi",
+  "playerSetup": "Oyuncu Ayarları",
+  "enterPlayerCount": "Oyuncu sayısını girin",
+  "playerName": "Oyuncu Adı",
+  "addPlayer": "Oyuncu Ekle",
+  "removePlayer": "Kaldır",
+  "continueButton": "Devam Et",
+  "roleSetup": "Rol Ayarları",
+  "totalRolesMustMatch": "Toplam rol sayısı oyuncu sayısına eşit olmalı",
+  "rolesSelected": "{count} rol seçildi",
+  "@rolesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playersCount": "{count} oyuncu",
+  "@playersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "villager": "Köylü",
+  "villagerDesc": "Sıradan bir köylü. Vampirleri bul ve oy vererek eleyin.",
+  "vampire": "Vampir",
+  "vampireDesc": "Her gece bir kurban seç. Köylüleri azalt.",
+  "doctor": "Doktor",
+  "doctorDesc": "Her gece birini koru. Vampir saldırısını engelle.",
+  "seer": "Kahin",
+  "seerDesc": "Her gece bir oyuncunun rolünü öğren.",
+  "hunter": "Avcı",
+  "hunterDesc": "Öldüğünde birini seçip öldürebilirsin.",
+  "witch": "Cadı",
+  "witchDesc": "Bir kurtarma ve bir öldürme iksirin var.",
+  "lovers": "Aşıklar",
+  "loversDesc": "İki oyuncu bağlı. Biri ölürse diğeri de ölür.",
+  "guard": "Muhafız",
+  "guardDesc": "Her gece birini koru. Aynı kişiyi arka arkaya koruyamazsın.",
+  "drunk": "Sarhoş",
+  "drunkDesc": "Rolünü oyunun ortasına kadar bilmezsin.",
+  "premiumRole": "Premium Rol",
+  "unlockPremium": "Premium Paketi Aç",
+  "premiumRequired": "Bu rol için premium gerekli",
+  "nextPlayer": "Sıradaki Oyuncu",
+  "solveMath": "Rolünü görmek için çöz",
+  "yourRole": "Senin Rolün",
+  "iSawIt": "Gördüm",
+  "allPlayersSawRoles": "Tüm oyuncular rollerini gördü",
+  "startNight": "Herkesi Uyut (Gece Başlasın)",
+  "nightPhase": "Gece Fazı",
+  "dayPhase": "Gündüz Fazı",
+  "votePhase": "Oylama Fazı",
+  "vampireSelectTarget": "Vampir: Hedef seç",
+  "doctorSelectProtection": "Doktor: Koruyacağın kişiyi seç",
+  "seerPeekRole": "Kahin: Rolünü görmek istediğin kişiyi seç",
+  "seerResult": "{player} rolü: {role}",
+  "@seerResult": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      },
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "endNight": "Geceyi Bitir",
+  "playerDied": "{player} öldü!",
+  "@playerDied": {
+    "placeholders": {
+      "player": {
+        "type": "String"
+      }
+    }
+  },
+  "nobodyDied": "Bu gece kimse ölmedi.",
+  "alivePlayers": "Hayatta Kalanlar",
+  "eventLog": "Olay Günlüğü",
+  "startVoting": "Oylamayı Başlat",
+  "selectPlayerToEliminate": "Elemine edilecek oyuncuyu seç",
+  "eliminate": "Elemine Et",
+  "skip": "Atla",
+  "villagersWin": "Köylüler Kazandı!",
+  "vampiresWin": "Vampirler Kazandı!",
+  "newGame": "Yeni Oyun",
+  "settings": "Ayarlar",
+  "soundEffects": "Ses Efektleri",
+  "language": "Dil",
+  "turkish": "Türkçe",
+  "english": "English",
+  "premiumOnly": "Sadece Premium",
+  "restorePurchases": "Satın Alımları Geri Yükle",
+  "purchaseRestored": "Satın alımlar geri yüklendi",
+  "noPurchasesToRestore": "Geri yüklenecek satın alım yok",
+  "about": "Hakkında",
+  "version": "Versiyon",
+  "premiumPackTitle": "Premium Parti Paketi",
+  "premiumPackDesc": "Tüm rolleri aç, reklamları kaldır ve İngilizce dil desteği kazan!",
+  "premiumPackPrice": "Tek Seferlik Satın Al",
+  "purchase": "Satın Al",
+  "alreadyPremium": "Zaten Premium",
+  "freeRoles": "Ücretsiz Roller",
+  "premiumRoles": "Premium Roller",
+  "locked": "Kilitli",
+  "adminPanel": "Yönetici Paneli",
+  "controlPanel": "Kontrol Paneli",
+  "backToSetup": "Ayarlara Dön",
+  "confirm": "Onayla",
+  "cancel": "İptal",
+  "warning": "Uyarı",
+  "ok": "Tamam",
+  "dead": "Öldü",
+  "alive": "Hayatta",
+  "player": "Oyuncu",
+  "role": "Rol",
+  "night": "Gece",
+  "day": "Gündüz",
+  "enterPin": "PIN Girin",
+  "incorrectPin": "Yanlış PIN",
+  "adminOverrideEnabled": "Yönetici yetkisi etkinleştirildi"
+}

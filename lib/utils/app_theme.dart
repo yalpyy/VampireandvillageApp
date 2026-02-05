@@ -53,7 +53,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      cardTheme: CardTheme(
+      cardTheme: const CardThemeData(
         color: surfaceBg,
         elevation: 4,
         shadowColor: Colors.black45,

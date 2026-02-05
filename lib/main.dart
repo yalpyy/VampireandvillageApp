@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/game_provider.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
+import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,17 +68,7 @@ class _VampirePartyAppState extends State<VampirePartyApp> {
           return MaterialApp(
             title: 'Vampir Partisi',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              brightness: Brightness.dark,
-              primaryColor: const Color(0xFFE94560),
-              scaffoldBackgroundColor: const Color(0xFF1A1A2E),
-              fontFamily: 'Roboto',
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
+            theme: AppTheme.darkTheme,
             locale: Locale(gameProvider.locale),
             home: _termsAccepted
                 ? const HomeScreen()

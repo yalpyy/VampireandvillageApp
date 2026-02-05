@@ -4,14 +4,28 @@ A single-device, offline party game inspired by "Vampire / Werewolf". The game i
 
 ## Features
 
+- **Moderator Mode**: The phone acts as a moderator console - all role decisions happen verbally in the room
 - **Offline Only**: No internet required
-- **Single Device**: Pass the phone between players
+- **Single Device**: Phone owner controls the game as moderator
 - **Multiple Roles**: Villager, Vampire, Doctor, Seer, Hunter, Witch, Lovers, Guard, Drunk
 - **Secure Role Reveal**: Math challenges prevent accidental role exposure
-- **Day/Night Cycle**: Full game phases with voting and elimination
-- **Sound Effects**: Atmospheric audio for each phase
+- **Timer System**: Configurable night/day timers with presets (30s, 60s, 90s, 2m, 3m, 5m)
+- **Sound Effects**: Wolf howl for night, rooster for day, atmospheric audio
+- **First Night Rule**: Night 1 has no actions - only timer and phase transitions
 - **Localization**: Turkish (default) and English (premium)
 - **Premium Features**: One-time purchase removes ads and unlocks all roles
+- **KVKK Compliance**: Terms acceptance on first launch
+
+## Game Flow (Moderator Mode)
+
+1. **Setup**: Add players, assign roles
+2. **Role Reveal**: Each player sees their role via math challenge
+3. **Moderator Screen**: 
+   - "Put Everyone to Sleep" → Wolf howl plays, night timer starts
+   - "Wake Everyone Up" → Rooster plays, day begins
+   - Mark players as dead manually
+   - Dead players show their revealed role
+4. **Win Condition**: Villagers win when all vampires eliminated, Vampires win when >= villagers
 
 ## Getting Started
 

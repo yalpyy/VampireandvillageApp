@@ -1,15 +1,21 @@
-# Vampire Party Game - PRD
+# Vampire Party Game - PRD (Updated)
 
 ## Original Problem Statement
-Build a single-device, offline, local-only party game inspired by "Vampire/Werewolf". 
+Build a single-device, offline, local-only party game inspired by "Vampire/Werewolf".
 - Played on ONE phone passed hand-to-hand
 - No backend, no login, no rooms, no realtime networking
-- Phone owner is admin and controls game flow
+- Phone owner is admin/moderator and controls game flow
 - Production-ready for Google Play and Apple App Store
 
+## Core Change: Moderator-Based Gameplay
+The game is now fully moderator-driven:
+- Role owners DO NOT select targets on the phone
+- All decisions happen verbally in the room
+- The phone acts only as a Moderator console
+
 ## User Personas
-1. **Party Host (Admin)**: Controls game setup, manages phases, passes phone
-2. **Players**: View their roles, participate in day discussions and voting
+1. **Moderator (Phone Owner)**: Controls game setup, timer, phase transitions, marks deaths
+2. **Players**: View their roles once, participate in verbal discussions and voting
 
 ## Core Requirements (Static)
 - Single device only
@@ -19,65 +25,66 @@ Build a single-device, offline, local-only party game inspired by "Vampire/Werew
 - No subscriptions (one-time purchase only)
 - Clean UI, party-friendly, large buttons
 - Privacy first (roles must never leak)
+- Moderator-only control panel (no role action UI)
 
 ## What's Been Implemented (Jan 2026)
 
-### Game Flow
-- ✅ Player Setup Screen (add/remove players)
-- ✅ Role Setup Screen (free + premium roles)
-- ✅ Role Distribution with math challenge security
-- ✅ Admin Control Panel
-- ✅ Night Phase (Vampire, Doctor, Seer, Guard actions)
-- ✅ Day Phase with event log
-- ✅ Vote Phase for elimination
-- ✅ Result Screen with role reveal
+### New Screens
+- ✅ HomeScreen - Fullscreen landing with animated "Start Game" button
+- ✅ TermsScreen - KVKK & Terms acceptance on first launch
+- ✅ ModeratorScreen - Main game hub with timer and player cards
 
-### Roles Implemented
-- Free: Villager, Vampire, Doctor
-- Premium: Seer, Hunter, Witch, Lovers, Guard, Drunk
+### Moderator Mode Features
+- ✅ "Put Everyone to Sleep" button (wolf howl sound)
+- ✅ "Wake Everyone Up" button (rooster sound)
+- ✅ Timer system with presets (30s, 60s, 90s, 120s for night; 1m, 2m, 3m, 5m for day)
+- ✅ Timer auto-starts when Sleep pressed
+- ✅ "Time's Up" indicator when timer ends
+- ✅ Player cards showing:
+  - Name only by default (alive)
+  - Crossed out with revealed role (dead)
+- ✅ Manual death marking via X button on player cards
 
-### Monetization
-- ✅ AdMob banner ads (test IDs configured)
-- ✅ In-app purchase setup (premium_party_pack)
-- ✅ Ads placement: setup screens, result screen, under New Game
-- ✅ No ads on: role reveal, math lock, night screens
+### Game Flow (Updated)
+- ✅ First night rule: No actions, no deaths (timer only)
+- ✅ All nights: No role-action UI (vampire/doctor/seer selections)
+- ✅ Moderator controls phase transitions
+- ✅ Win conditions unchanged (villagers vs vampires)
 
-### Features
-- ✅ Sound effects with graceful fallback
-- ✅ Turkish localization (default)
-- ✅ English localization (premium only)
-- ✅ Settings screen (sound toggle, language)
+### Existing Features (Preserved)
+- ✅ Player setup with add/remove
+- ✅ Role setup (free + premium roles)
+- ✅ Role reveal with math challenge security
+- ✅ Sound effects (wolf_howl, rooster, times_up added)
+- ✅ Turkish/English localization
+- ✅ Premium features (ads removal, all roles, English)
 - ✅ Hidden admin override (5-tap logo + PIN)
-- ✅ Restore purchases functionality
-
-### Technical
-- ✅ Provider state management
-- ✅ SharedPreferences for local storage
-- ✅ Fisher-Yates shuffle for role assignment
-- ✅ SHA256 + salt PIN hashing
 
 ## Prioritized Backlog
 
 ### P0 (Critical)
-- Replace test AdMob IDs with production IDs
-- Add actual sound effect files
-- Configure in-app purchase products in stores
+- Replace placeholder sound files with real audio
+- Test full game flow end-to-end
+- Configure AdMob production IDs
 
 ### P1 (Important)
-- Add Hunter death action (shoot when eliminated)
-- Add Witch save/kill actions in night phase
-- Add Lovers mechanics (both die together)
-- Add Drunk role reveal mid-game
+- Custom timer input (manual minutes/seconds)
+- Game log/history persistence
 
 ### P2 (Nice to Have)
-- Custom themes/color schemes
-- Game history/statistics
-- Tutorial/onboarding screens
+- Background image assets for home screen
+- More visual polish (animations, transitions)
 - Accessibility improvements
 
+## Sound Files Required
+- wolf_howl.mp3 - Wolf howl for night start
+- rooster.mp3 - Rooster crow for day start
+- times_up.mp3 - Short alert when timer ends
+- death.mp3 - Death sound effect
+- game_end.mp3 - Victory/end sound
+
 ## Next Tasks
-1. Replace placeholder sound files with actual audio
-2. Set up AdMob production account
-3. Configure Google Play Console in-app products
-4. Configure App Store Connect in-app purchases
-5. Build release APK and IPA for store submission
+1. Add real sound effect files
+2. Test complete game flow
+3. Build release APK/IPA
+4. Store submission preparation

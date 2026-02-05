@@ -166,11 +166,28 @@ class GameProvider with ChangeNotifier {
   bool get allPlayersRevealed =>
       _state.currentRevealIndex >= _state.players.length;
 
-  // Night Phase
+  // Night Phase - Simplified for moderator mode
   void startNight() {
     _state.nightActions.reset();
     _state.nightCount++;
+    _state.isNightPhase = true;
     setPhase(GamePhase.night);
+  }
+
+  void incrementNightCount() {
+    // Called when waking up from night
+    notifyListeners();
+  }
+
+  // Kill player - used by moderator
+  void killPlayer(String playerId) {
+    final playerIndex = _state.players.indexWhere((p) => p.id == playerId);
+    if (playerIndex != -1 && _state.players[playerIndex].isAlive) {
+      _state.players[playerIndex].isAlive = false;
+      final playerName = _state.players[playerIndex].name;
+      _state.logs.add('${_state.players[playerIndex].name} öldü');
+      notifyListeners();
+    }
   }
 
   void setVampireTarget(String? playerId) {

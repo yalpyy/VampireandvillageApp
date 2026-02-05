@@ -178,7 +178,7 @@ class ResultScreen extends StatelessWidget {
                     gameProvider.resetGame();
                     Navigator.pushNamedAndRemoveUntil(
                       context,
-                      '/',
+                      '/home',
                       (route) => false,
                     );
                   },

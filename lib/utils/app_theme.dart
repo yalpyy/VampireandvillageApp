@@ -53,14 +53,14 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      cardTheme: const CardThemeData(
-        color: surfaceBg,
-        elevation: 4,
-        shadowColor: Colors.black45,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusMd),
-        ),
-      ),
+      cardTheme: CardThemeData(
+  color: surfaceBg,
+  elevation: 4,
+  shadowColor: Colors.black45,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(radiusMd),
+  ),
+),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primaryRed,
@@ -128,12 +128,12 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(radiusLg)),
         ),
       ),
-     dialogTheme: const DialogThemeData(
-        backgroundColor: cardBg,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusLg),
-        ),
-      ),
+     dialogTheme: DialogThemeData(
+  backgroundColor: cardBg,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(radiusLg),
+  ),
+),
     );
   }
 

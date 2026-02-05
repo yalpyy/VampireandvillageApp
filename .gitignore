@@ -8,3 +8,7 @@ build/
 .flutter-plugins
 .flutter-plugins-dependencies
 .metadata
+-e 
+# Environment files
+*.env
+*.env.*

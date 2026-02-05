@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../services/sound_service.dart';
+import '../utils/app_theme.dart';
 import '../utils/localization_helper.dart';
 
 class ModeratorScreen extends StatefulWidget {
@@ -20,11 +21,8 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
   bool _showTimesUp = false;
 
   // Timer settings
-  int _nightDuration = 60; // Default 60 seconds
-  int _dayDuration = 120; // Default 2 minutes
-
+  int _selectedNightPreset = 60;
   final List<int> _nightPresets = [30, 60, 90, 120];
-  final List<int> _dayPresets = [60, 120, 180, 300];
 
   @override
   void dispose() {
@@ -71,7 +69,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
-      _remainingSeconds = _isNight ? _nightDuration : _dayDuration;
+      _remainingSeconds = _selectedNightPreset;
       _timerRunning = false;
       _showTimesUp = false;
     });
@@ -88,8 +86,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
       SoundService().playWolfHowl();
     }
 
-    // Auto-start night timer
-    _startTimer(_nightDuration);
+    _startTimer(_selectedNightPreset);
   }
 
   void _wakeUp() {
@@ -105,8 +102,112 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
       SoundService().playRooster();
     }
 
-    // Increment night count when waking up
     gameProvider.incrementNightCount();
+  }
+
+  void _showKillBottomSheet(String playerId, String playerName) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: EdgeInsets.only(
+          left: AppTheme.spacingLg,
+          right: AppTheme.spacingLg,
+          top: AppTheme.spacingLg,
+          bottom: MediaQuery.of(ctx).padding.bottom + AppTheme.spacingLg,
+        ),
+        decoration: const BoxDecoration(
+          color: AppTheme.cardBg,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusLg)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingLg),
+            const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 48),
+            const SizedBox(height: AppTheme.spacingMd),
+            Text(
+              '$playerName öldü mü?',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingXs),
+            Text(
+              'Bu işlem geri alınamaz',
+              style: TextStyle(color: Colors.white.withOpacity(0.5)),
+            ),
+            const SizedBox(height: AppTheme.spacingXl),
+            // Kill button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _markPlayerDead(playerId);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  minimumSize: const Size(double.infinity, AppTheme.buttonHeightLg),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.close, size: 24),
+                    SizedBox(width: AppTheme.spacingXs),
+                    Text(
+                      'ÖLDÜR',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppTheme.spacingSm),
+            // Cancel button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, AppTheme.buttonHeight),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                  ),
+                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: const Text(
+                  'İPTAL',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _markPlayerDead(String playerId) {
@@ -117,7 +218,6 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
       SoundService().playDeath();
     }
 
-    // Check win condition
     final winner = gameProvider.state.checkWinCondition();
     if (winner != null) {
       gameProvider.state.winner = winner;
@@ -126,113 +226,6 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
       }
       Navigator.pushReplacementNamed(context, '/result');
     }
-  }
-
-  void _showTimerSettings() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Zamanlayıcı Ayarları',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
-              // Night Duration
-              const Text(
-                'Gece Süresi',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                children: _nightPresets.map((seconds) {
-                  final isSelected = _nightDuration == seconds;
-                  return ChoiceChip(
-                    label: Text(_formatDuration(seconds)),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setModalState(() => _nightDuration = seconds);
-                      setState(() {});
-                    },
-                    selectedColor: const Color(0xFF4A148C),
-                    backgroundColor: const Color(0xFF0F3460),
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white70,
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-              // Day Duration
-              const Text(
-                'Gündüz Tartışma Süresi',
-                style: TextStyle(color: Colors.white70, fontSize: 16),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                children: _dayPresets.map((seconds) {
-                  final isSelected = _dayDuration == seconds;
-                  return ChoiceChip(
-                    label: Text(_formatDuration(seconds)),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setModalState(() => _dayDuration = seconds);
-                      setState(() {});
-                    },
-                    selectedColor: const Color(0xFFE94560),
-                    backgroundColor: const Color(0xFF0F3460),
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.white70,
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE94560),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Tamam',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  String _formatDuration(int seconds) {
-    if (seconds < 60) return '${seconds}s';
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    if (secs == 0) return '${minutes}dk';
-    return '${minutes}dk ${secs}s';
   }
 
   String _formatTimer(int seconds) {
@@ -248,299 +241,532 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
     final players = gameProvider.players;
 
     return Scaffold(
-      backgroundColor: _isNight ? const Color(0xFF0D0D1A) : const Color(0xFF1A1A2E),
-      appBar: AppBar(
-        backgroundColor: _isNight ? const Color(0xFF1A0A2E) : const Color(0xFF16213E),
-        title: Text(
-          _isNight ? 'Gece ${gameProvider.state.nightCount + 1}' : 'Gündüz',
-          style: const TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                backgroundColor: const Color(0xFF1A1A2E),
-                title: const Text(
-                  'Oyundan Çık',
-                  style: TextStyle(color: Colors.white),
-                ),
-                content: const Text(
-                  'Oyundan çıkmak istediğinize emin misiniz?',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: const Text('İptal'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      gameProvider.resetGame();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE94560),
-                    ),
-                    child: const Text(
-                      'Çık',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background
+          _buildBackground(),
+          // Dark overlay
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: _isNight
+                    ? [
+                        Colors.black.withOpacity(0.7),
+                        const Color(0xFF1A0A2E).withOpacity(0.9),
+                      ]
+                    : [
+                        Colors.black.withOpacity(0.5),
+                        AppTheme.darkBg.withOpacity(0.85),
+                      ],
               ),
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.timer, color: Colors.white70),
-            onPressed: _showTimerSettings,
+            ),
+          ),
+          // Content
+          SafeArea(
+            child: Column(
+              children: [
+                // App bar
+                _buildAppBar(gameProvider, l),
+                // Timer section
+                _buildTimerSection(),
+                // Timer presets
+                _buildTimerPresets(),
+                // Player list
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(AppTheme.spacingMd),
+                    itemCount: players.length,
+                    itemBuilder: (context, index) =>
+                        _buildPlayerCard(players[index], l),
+                  ),
+                ),
+                // Phase control button
+                _buildPhaseControl(),
+              ],
+            ),
           ),
         ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Timer Display
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              color: _isNight
-                  ? const Color(0xFF4A148C).withOpacity(0.3)
-                  : const Color(0xFFE94560).withOpacity(0.2),
-              child: Column(
-                children: [
-                  if (_showTimesUp)
-                    const Text(
-                      '⏰ SÜRE DOLDU!',
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  else
-                    Text(
-                      _formatTimer(_remainingSeconds),
-                      style: TextStyle(
-                        color: _remainingSeconds <= 10 && _remainingSeconds > 0
-                            ? Colors.orange
-                            : Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  // Timer Controls
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        onPressed: _timerRunning ? _pauseTimer : _resumeTimer,
-                        icon: Icon(
-                          _timerRunning ? Icons.pause : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 28,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: _resetTimer,
-                        icon: const Icon(
-                          Icons.refresh,
-                          color: Colors.white70,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Player Cards
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: players.length,
-                itemBuilder: (context, index) {
-                  final player = players[index];
-                  final isDead = !player.isAlive;
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: isDead
-                          ? const Color(0xFF2D2D2D).withOpacity(0.5)
-                          : const Color(0xFF0F3460),
-                      borderRadius: BorderRadius.circular(12),
-                      border: isDead
-                          ? Border.all(color: Colors.red.withOpacity(0.3))
-                          : null,
-                    ),
-                    child: Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              // Player icon/status
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isDead
-                                      ? Colors.grey.withOpacity(0.3)
-                                      : const Color(0xFF16213E),
-                                ),
-                                child: Center(
-                                  child: isDead
-                                      ? Text(
-                                          player.assignedRole?.iconPath ?? '💀',
-                                          style: const TextStyle(fontSize: 24),
-                                        )
-                                      : const Icon(
-                                          Icons.person,
-                                          color: Colors.white70,
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              // Player info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      player.name,
-                                      style: TextStyle(
-                                        color: isDead ? Colors.grey : Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        decoration: isDead
-                                            ? TextDecoration.lineThrough
-                                            : null,
-                                      ),
-                                    ),
-                                    if (isDead && player.assignedRole != null)
-                                      Text(
-                                        l.getRoleName(player.assignedRole!.nameKey),
-                                        style: const TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              // Kill button (only for alive players)
-                              if (!isDead)
-                                IconButton(
-                                  onPressed: () => _showKillConfirmation(player.id, player.name),
-                                  icon: const Icon(
-                                    Icons.close,
-                                    color: Colors.red,
-                                    size: 24,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        // Dead overlay
-                        if (isDead)
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: CrossOutPainter(),
-                            ),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            // Phase Control Buttons
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: _isNight
-                  ? _buildWakeButton()
-                  : _buildSleepButton(),
-            ),
-          ],
-        ),
       ),
     );
   }
 
+  Widget _buildBackground() {
+    return Image.asset(
+      'assets/images/moderator_background.png',
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: _isNight
+                  ? [const Color(0xFF1A0A2E), const Color(0xFF0D0D1A)]
+                  : [const Color(0xFF16213E), const Color(0xFF1A1A2E)],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildAppBar(GameProvider gameProvider, LocalizationHelper l) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingMd,
+        vertical: AppTheme.spacingSm,
+      ),
+      child: Row(
+        children: [
+          // Back button
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+              color: Colors.white,
+              onPressed: () => _showExitDialog(gameProvider),
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingMd),
+          // Phase indicator
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingMd,
+                vertical: AppTheme.spacingSm,
+              ),
+              decoration: BoxDecoration(
+                color: _isNight
+                    ? AppTheme.darkPurple.withOpacity(0.4)
+                    : AppTheme.primaryRed.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                border: Border.all(
+                  color: _isNight
+                      ? AppTheme.darkPurple.withOpacity(0.5)
+                      : AppTheme.primaryRed.withOpacity(0.4),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _isNight ? Icons.nightlight_round : Icons.wb_sunny,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  const SizedBox(width: AppTheme.spacingXs),
+                  Text(
+                    _isNight
+                        ? 'GECE ${gameProvider.state.nightCount + 1}'
+                        : 'GÜNDÜZ',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingMd),
+          // Player count
+          Container(
+            padding: const EdgeInsets.all(AppTheme.spacingSm),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '${gameProvider.state.alivePlayers.length}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimerSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
+      child: Column(
+        children: [
+          // Timer display
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppTheme.spacingXl,
+              vertical: AppTheme.spacingMd,
+            ),
+            decoration: BoxDecoration(
+              color: _showTimesUp
+                  ? Colors.orange.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+              border: Border.all(
+                color: _showTimesUp
+                    ? Colors.orange.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.1),
+              ),
+            ),
+            child: Column(
+              children: [
+                if (_showTimesUp)
+                  const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.alarm, color: Colors.orange, size: 24),
+                      SizedBox(width: AppTheme.spacingXs),
+                      Text(
+                        'SÜRE DOLDU!',
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    _formatTimer(_remainingSeconds),
+                    style: TextStyle(
+                      color: _remainingSeconds <= 10 && _remainingSeconds > 0
+                          ? Colors.orange
+                          : Colors.white,
+                      fontSize: 56,
+                      fontWeight: FontWeight.w200,
+                      fontFamily: 'monospace',
+                      letterSpacing: 4,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingSm),
+          // Timer controls
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildTimerControlButton(
+                icon: _timerRunning ? Icons.pause : Icons.play_arrow,
+                onPressed: _timerRunning ? _pauseTimer : _resumeTimer,
+                primary: true,
+              ),
+              const SizedBox(width: AppTheme.spacingSm),
+              _buildTimerControlButton(
+                icon: Icons.refresh,
+                onPressed: _resetTimer,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimerControlButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    bool primary = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: primary
+            ? AppTheme.primaryRed.withOpacity(0.2)
+            : Colors.white.withOpacity(0.1),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon),
+        color: primary ? AppTheme.primaryRed : Colors.white70,
+        iconSize: 24,
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  Widget _buildTimerPresets() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingMd,
+        vertical: AppTheme.spacingXs,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _nightPresets.map((seconds) {
+          final isSelected = _selectedNightPreset == seconds;
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedNightPreset = seconds;
+                if (!_timerRunning) {
+                  _remainingSeconds = seconds;
+                }
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingMd,
+                vertical: AppTheme.spacingXs,
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppTheme.primaryRed
+                    : Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(AppTheme.radiusFull),
+                border: Border.all(
+                  color: isSelected
+                      ? AppTheme.primaryRed
+                      : Colors.white.withOpacity(0.1),
+                ),
+              ),
+              child: Text(
+                '${seconds}s',
+                style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.white60,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildPlayerCard(player, LocalizationHelper l) {
+    final isDead = !player.isAlive;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppTheme.spacingSm),
+      decoration: BoxDecoration(
+        color: isDead
+            ? Colors.black.withOpacity(0.4)
+            : AppTheme.surfaceBg.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(
+          color: isDead
+              ? Colors.red.withOpacity(0.2)
+              : Colors.white.withOpacity(0.05),
+        ),
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppTheme.spacingMd),
+            child: Row(
+              children: [
+                // Avatar/Role icon
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: isDead
+                        ? Colors.grey.withOpacity(0.2)
+                        : AppTheme.darkPurple.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  ),
+                  child: Center(
+                    child: isDead
+                        ? Text(
+                            player.assignedRole?.iconPath ?? '💀',
+                            style: const TextStyle(fontSize: 26),
+                          )
+                        : const Icon(Icons.person, color: Colors.white54),
+                  ),
+                ),
+                const SizedBox(width: AppTheme.spacingMd),
+                // Player info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        player.name,
+                        style: TextStyle(
+                          color: isDead ? Colors.grey : Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          decoration:
+                              isDead ? TextDecoration.lineThrough : null,
+                          decorationColor: Colors.red,
+                          decorationThickness: 2,
+                        ),
+                      ),
+                      if (isDead && player.assignedRole != null)
+                        Row(
+                          children: [
+                            const Icon(Icons.visibility,
+                                color: Colors.grey, size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              l.getRoleName(player.assignedRole!.nameKey),
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                // Kill button (only for alive players)
+                if (!isDead)
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.red.withOpacity(0.3),
+                      ),
+                    ),
+                    child: IconButton(
+                      onPressed: () =>
+                          _showKillBottomSheet(player.id, player.name),
+                      icon: const Icon(Icons.close, color: Colors.red),
+                      iconSize: 20,
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          // Dead overlay line
+          if (isDead)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _DiagonalLinePainter(),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhaseControl() {
+    return Container(
+      padding: EdgeInsets.only(
+        left: AppTheme.spacingMd,
+        right: AppTheme.spacingMd,
+        top: AppTheme.spacingMd,
+        bottom: MediaQuery.of(context).padding.bottom + AppTheme.spacingMd,
+      ),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBg.withOpacity(0.95),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: _isNight ? _buildWakeButton() : _buildSleepButton(),
+    );
+  }
+
   Widget _buildSleepButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _putToSleep,
-        icon: const Icon(Icons.nightlight_round, color: Colors.white, size: 28),
-        label: const Text(
-          'Herkesi Uyut',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+    return ElevatedButton(
+      onPressed: _putToSleep,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.darkPurple,
+        minimumSize: const Size(double.infinity, AppTheme.buttonHeightLg),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4A148C),
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        elevation: 6,
+        shadowColor: AppTheme.darkPurple.withOpacity(0.5),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.nightlight_round, size: 26),
+          SizedBox(width: AppTheme.spacingSm),
+          Text(
+            'HERKESİ UYUT',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
           ),
-        ),
+          SizedBox(width: AppTheme.spacingXs),
+          Text('🐺', style: TextStyle(fontSize: 20)),
+        ],
       ),
     );
   }
 
   Widget _buildWakeButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: _wakeUp,
-        icon: const Icon(Icons.wb_sunny, color: Colors.white, size: 28),
-        label: const Text(
-          'Herkesi Uyandır',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+    return ElevatedButton(
+      onPressed: _wakeUp,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.primaryRed,
+        minimumSize: const Size(double.infinity, AppTheme.buttonHeightLg),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE94560),
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+        elevation: 6,
+        shadowColor: AppTheme.primaryRed.withOpacity(0.5),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.wb_sunny, size: 26),
+          SizedBox(width: AppTheme.spacingSm),
+          Text(
+            'HERKESİ UYANDIR',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
           ),
-        ),
+          SizedBox(width: AppTheme.spacingXs),
+          Text('🐓', style: TextStyle(fontSize: 20)),
+        ],
       ),
     );
   }
 
-  void _showKillConfirmation(String playerId, String playerName) {
+  void _showExitDialog(GameProvider gameProvider) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: AppTheme.cardBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        ),
         title: const Text(
-          'Oyuncu Öldü',
+          'Oyundan Çık',
           style: TextStyle(color: Colors.white),
         ),
-        content: Text(
-          '$playerName öldü olarak işaretlensin mi?',
-          style: const TextStyle(color: Colors.white70),
+        content: const Text(
+          'Oyundan çıkmak istediğinize emin misiniz? İlerleme kaydedilmeyecek.',
+          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
@@ -550,15 +776,17 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _markPlayerDead(playerId);
+              gameProvider.resetGame();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/home',
+                (route) => false,
+              );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: AppTheme.primaryRed,
             ),
-            child: const Text(
-              'Öldür',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Çık'),
           ),
         ],
       ),
@@ -566,12 +794,11 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
   }
 }
 
-// Custom painter for crossed out effect
-class CrossOutPainter extends CustomPainter {
+class _DiagonalLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.red.withOpacity(0.4)
+      ..color = Colors.red.withOpacity(0.3)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/game_provider.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
@@ -20,11 +21,34 @@ void main() async {
     // In-app purchases might not be configured yet
   }
 
-  runApp(const VampirePartyApp());
+  // Check if terms accepted
+  final prefs = await SharedPreferences.getInstance();
+  final termsAccepted = prefs.getBool('termsAccepted') ?? false;
+
+  runApp(VampirePartyApp(termsAccepted: termsAccepted));
 }
 
-class VampirePartyApp extends StatelessWidget {
-  const VampirePartyApp({super.key});
+class VampirePartyApp extends StatefulWidget {
+  final bool termsAccepted;
+
+  const VampirePartyApp({super.key, required this.termsAccepted});
+
+  @override
+  State<VampirePartyApp> createState() => _VampirePartyAppState();
+}
+
+class _VampirePartyAppState extends State<VampirePartyApp> {
+  late bool _termsAccepted;
+
+  @override
+  void initState() {
+    super.initState();
+    _termsAccepted = widget.termsAccepted;
+  }
+
+  void _onTermsAccepted() {
+    setState(() => _termsAccepted = true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +72,23 @@ class VampirePartyApp extends StatelessWidget {
               primaryColor: const Color(0xFFE94560),
               scaffoldBackgroundColor: const Color(0xFF1A1A2E),
               fontFamily: 'Roboto',
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                ),
+              ),
             ),
             locale: Locale(gameProvider.locale),
-            initialRoute: '/',
+            home: _termsAccepted
+                ? const HomeScreen()
+                : TermsScreen(onAccepted: _onTermsAccepted),
             routes: {
-              '/': (_) => const PlayerSetupScreen(),
+              '/home': (_) => const HomeScreen(),
+              '/player-setup': (_) => const PlayerSetupScreen(),
               '/role-setup': (_) => const RoleSetupScreen(),
               '/role-reveal': (_) => const RoleRevealScreen(),
               '/admin-control': (_) => const AdminControlScreen(),
+              '/moderator': (_) => const ModeratorScreen(),
               '/night': (_) => const NightScreen(),
               '/day': (_) => const DayScreen(),
               '/vote': (_) => const VoteScreen(),

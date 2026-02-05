@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../services/ad_service.dart';
+
+// Conditional import for AdWidget
+import 'ad_banner_widget_stub.dart'
+    if (dart.library.io) 'ad_banner_widget_mobile.dart' as ad_widget;
 
 class AdBannerWidget extends StatefulWidget {
   const AdBannerWidget({super.key});
@@ -20,13 +24,13 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_adService.isAdLoaded || _adService.bannerAd == null) {
+    if (kIsWeb || !_adService.isAdLoaded || _adService.bannerAd == null) {
       return const SizedBox(height: 50);
     }
 
     return SizedBox(
       height: 50,
-      child: AdWidget(ad: _adService.bannerAd!),
+      child: ad_widget.buildAdWidget(_adService.bannerAd),
     );
   }
 }

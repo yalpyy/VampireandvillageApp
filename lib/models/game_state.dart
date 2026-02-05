@@ -55,6 +55,7 @@ class GameState {
   int currentRevealIndex;
   int nightCount;
   String? winner;
+  bool isNightPhase;
 
   GameState({
     List<Player>? players,
@@ -65,6 +66,7 @@ class GameState {
     this.currentRevealIndex = 0,
     this.nightCount = 0,
     this.winner,
+    this.isNightPhase = false,
   })
       : players = players ?? [],
         roleCounts = roleCounts ?? {},

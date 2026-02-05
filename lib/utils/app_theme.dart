@@ -128,7 +128,7 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(radiusLg)),
         ),
       ),
-      dialogTheme: DialogTheme(
+     dialogTheme: const DialogThemeData(
         backgroundColor: cardBg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusLg),

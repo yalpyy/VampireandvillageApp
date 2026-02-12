@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../widgets/ad_banner_widget.dart';
 import '../utils/app_theme.dart';
 import '../utils/localization_helper.dart';
 
@@ -113,6 +114,8 @@ class _HomeScreenState extends State<HomeScreen>
                   _buildStartButton(gameProvider),
                   const SizedBox(height: AppTheme.spacingXxl),
                   const Spacer(),
+                  // Banner Ad
+                  if (gameProvider.adsEnabled) const AdBannerWidget(),
                 ],
               ),
             ),
@@ -183,10 +186,17 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
-          child: const Center(
-            child: Text(
-              '🧛',
-              style: TextStyle(fontSize: 70),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/app_icon.png',
+              width: 140,
+              height: 140,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Text('🧛', style: TextStyle(fontSize: 70)),
+                );
+              },
             ),
           ),
         );

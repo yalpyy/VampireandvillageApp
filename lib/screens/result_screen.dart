@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../widgets/ad_banner_widget.dart';
 import '../widgets/paywall_dialog.dart';
+import '../services/ad_service.dart';
 import '../utils/localization_helper.dart';
 
-class ResultScreen extends StatelessWidget {
+class ResultScreen extends StatefulWidget {
   const ResultScreen({super.key});
+
+  @override
+  State<ResultScreen> createState() => _ResultScreenState();
+}
+
+class _ResultScreenState extends State<ResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Oyun bittiginde interstitial reklam goster
+    AdService().showInterstitialAd();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +147,7 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
             // Ads allowed on result screen
-            if (gameProvider.adsEnabled) _buildAdBanner(),
+            if (gameProvider.adsEnabled) const AdBannerWidget(),
             // Premium upsell card
             if (!gameProvider.isPremium)
               GestureDetector(
@@ -201,24 +215,11 @@ class ResultScreen extends StatelessWidget {
               ),
             ),
             // Ads allowed under New Game button
-            if (gameProvider.adsEnabled) _buildAdBanner(),
+            if (gameProvider.adsEnabled) const AdBannerWidget(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAdBanner() {
-    return Container(
-      height: 50,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      color: const Color(0xFF16213E),
-      child: const Center(
-        child: Text(
-          'Ad Banner Placeholder',
-          style: TextStyle(color: Colors.white38),
-        ),
-      ),
-    );
-  }
 }

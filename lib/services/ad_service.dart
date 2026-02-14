@@ -14,6 +14,10 @@ class AdConfig {
   // Test Ad Unit IDs (use these during development)
   static const String androidBannerAdUnitId = 'ca-app-pub-3940256099942544/6300978111';
   static const String iosBannerAdUnitId = 'ca-app-pub-3940256099942544/2934735716';
+
+  // Interstitial Test Ad Unit IDs
+  static const String androidInterstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String iosInterstitialAdUnitId = 'ca-app-pub-3940256099942544/4411468910';
 }
 
 class AdService {
@@ -41,6 +45,16 @@ class AdService {
   Future<void> loadBannerAd() async {
     if (_isPremium || kIsWeb) return;
     await ad_impl.loadBanner();
+  }
+
+  Future<void> loadInterstitialAd() async {
+    if (_isPremium || kIsWeb) return;
+    await ad_impl.loadInterstitial();
+  }
+
+  Future<void> showInterstitialAd() async {
+    if (_isPremium || kIsWeb) return;
+    await ad_impl.showInterstitial();
   }
 
   void dispose() {

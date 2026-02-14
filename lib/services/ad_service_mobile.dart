@@ -38,8 +38,36 @@ Future<void> loadBanner() async {
   await _bannerAd?.load();
 }
 
+// Interstitial Ad
+InterstitialAd? _interstitialAd;
+
+Future<void> loadInterstitial() async {
+  final adUnitId = Platform.isAndroid
+      ? AdConfig.androidInterstitialAdUnitId
+      : AdConfig.iosInterstitialAdUnitId;
+
+  await InterstitialAd.load(
+    adUnitId: adUnitId,
+    request: const AdRequest(),
+    adLoadCallback: InterstitialAdLoadCallback(
+      onAdLoaded: (ad) => _interstitialAd = ad,
+      onAdFailedToLoad: (error) => _interstitialAd = null,
+    ),
+  );
+}
+
+Future<void> showInterstitial() async {
+  if (_interstitialAd != null) {
+    await _interstitialAd!.show();
+    _interstitialAd = null;
+    await loadInterstitial();
+  }
+}
+
 void disposeAds() {
   _bannerAd?.dispose();
   _bannerAd = null;
   _isAdLoaded = false;
+  _interstitialAd?.dispose();
+  _interstitialAd = null;
 }

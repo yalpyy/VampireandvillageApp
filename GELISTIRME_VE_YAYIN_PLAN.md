@@ -540,37 +540,42 @@ if (gameProvider.adsEnabled) const AdBannerWidget(),
 
 ### Faz 1: iOS Proje Temeli
 
-- [ ] 1.1 `Info.plist` dosyasini yedekleyin
-- [ ] 1.2 `flutter create . --org com.vampireparty --project-name vampire_party_game` calistirin
-- [ ] 1.3 Yedeklenen `Info.plist` icindeki ozel ayarlari geri uygulayin
-- [ ] 1.4 `ios/Podfile`'da minimum iOS versiyonunu 14.0 olarak ayarlayin
-- [ ] 1.5 `flutter pub get` ve `cd ios && pod install` calistirin
+- [ ] 1.1 `flutter create . --org com.vampireparty --project-name vampire_party_game` calistirin (Podfile, xcodeproj olusturur)
+- [ ] 1.2 `ios/Podfile`'da minimum iOS versiyonunu 14.0 olarak ayarlayin
+- [ ] 1.3 `flutter pub get` ve `cd ios && pod install` calistirin
+
+> **NOT:** Bu adim Mac uzerinde Xcode ile yapilmali. Info.plist ve Assets zaten guncellendi.
 
 ### Faz 2: AdMob ve ATT Entegrasyonu
 
-- [ ] 2.1 `pubspec.yaml`'a `app_tracking_transparency: ^2.0.6` ekleyin
-- [ ] 2.2 `Info.plist`'e `NSUserTrackingUsageDescription` ekleyin
-- [ ] 2.3 `Info.plist`'teki SKAdNetworkItems listesini genisletin
-- [ ] 2.4 `main.dart`'a ATT izin isteme kodunu ekleyin (AdMob init'ten ONCE)
-- [ ] 2.5 Interstitial reklam desteGini `ad_service.dart` ve `ad_service_mobile.dart`'a ekleyin
-- [ ] 2.6 Banner reklamlari ilgili ekranlara yerlestirin (home, result, day)
-- [ ] 2.7 AdMob Console'dan uretim reklam ID'lerini alin ve degistirin
+- [x] 2.1 `pubspec.yaml`'a `app_tracking_transparency: ^2.0.6` eklendi
+- [x] 2.2 `Info.plist`'e `NSUserTrackingUsageDescription` eklendi
+- [x] 2.3 `Info.plist`'teki SKAdNetworkItems listesi genisletildi (33 adet)
+- [x] 2.4 `main.dart`'a ATT izin isteme kodu eklendi (AdMob init'ten ONCE)
+- [x] 2.5 Interstitial reklam destegi `ad_service.dart`, `ad_service_mobile.dart` ve `ad_service_stub.dart`'a eklendi
+- [x] 2.6 Banner reklamlar `home_screen.dart` ve `result_screen.dart`'a yerlestirildi
+- [x] 2.7 Interstitial reklam `result_screen.dart`'ta oyun sonunda tetikleniyor
+- [ ] 2.8 AdMob Console'dan uretim reklam ID'lerini alin ve degistirin
 
 ### Faz 3: Ikon ve Gorseller
 
-- [ ] 3.1 1024x1024 uygulama ikonu tasarlayin (alpha kanali olmamali!)
-- [ ] 3.2 appicon.co veya benzeri aracla tum iOS boyutlarini uretin
-- [ ] 3.3 `ios/Runner/Assets.xcassets/AppIcon.appiconset/` klasorune yerlestirin
-- [ ] 3.4 LaunchScreen.storyboard'u guncelleyin
+- [x] 3.1 1024x1024 uygulama ikonu tasarlandi
+- [x] 3.2 Tum iOS boyutlari uretildi (iPhone, iPad, Watch, Mac - 37 dosya)
+- [x] 3.3 `ios/Runner/Assets.xcassets/AppIcon.appiconset/` klasorune yerlestirildi
+- [x] 3.4 Uygulama icindeki emoji logolar gercek ikon ile degistirildi (home, about, terms)
+- [ ] 3.5 LaunchScreen.storyboard'u guncelleyin (Mac/Xcode gerekli)
 
 ### Faz 4: Kod Duzeltmeleri
 
-- [ ] 4.1 Restore Purchases butonunu aktif edin (`settings_screen.dart`)
-- [ ] 4.2 Gizlilik politikasi linkini About veya Settings ekranina ekleyin
-- [ ] 4.3 `url_launcher` paketini ekleyin ve gizlilik politikasi linkini acilabilir yapin
-- [ ] 4.4 iPad uyumluluGunu test edin veya iPad destegini kaldirin
+- [x] 4.1 Restore Purchases butonu aktif edildi (`settings_screen.dart` - PurchaseService entegre)
+- [x] 4.2 Gizlilik politikasi linki About VE Settings ekranina eklendi
+- [x] 4.3 `url_launcher` paketi eklendi ve linkler acilabilir yapildi
+- [x] 4.4 Kullanim Kosullari linki About ekranina eklendi
+- [x] 4.5 KVKK metni Turkiye Apple Store standartlarina uygun genisletildi (AdMob, ATT, KVKK haklari)
+- [x] 4.6 Terms ekranindaki hukuki metinler guncellendi (reklam, yas siniri, iade politikasi)
+- [ ] 4.7 iPad uyumlulugunu test edin veya iPad destegini kaldirin
 
-### Faz 5: Test
+### Faz 5: Test (Mac/Xcode gerekli)
 
 - [ ] 5.1 iOS Simulator'da uygulamayi calistirin
 - [ ] 5.2 Gercek iOS cihazda test edin
@@ -580,10 +585,10 @@ if (gameProvider.adsEnabled) const AdBannerWidget(),
 - [ ] 5.6 Tum ekranlari kontrol edin (crash, layout, vs.)
 - [ ] 5.7 iPad'de layout kontrolu yapin
 
-### Faz 6: App Store Yayin
+### Faz 6: App Store Yayin (Mac/Xcode gerekli)
 
 - [ ] 6.1 AdMob'da uretim reklam ID'lerini olusturun ve koda yerlestirin
-- [ ] 6.2 Gizlilik politikasi sayfasini yayinlayin
+- [ ] 6.2 Gizlilik politikasi sayfasini yayinlayin (GitHub Pages onerilir)
 - [ ] 6.3 App Store Connect'te uygulamayi tanimlayin
 - [ ] 6.4 Ekran goruntuleri alin (iPhone + iPad)
 - [ ] 6.5 App Privacy beyanlarini doldurun

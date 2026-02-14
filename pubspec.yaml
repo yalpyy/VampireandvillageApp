@@ -18,6 +18,9 @@ dependencies:
   audioplayers: ^5.2.1
   intl: ^0.20.2
   crypto: ^3.0.3
+  app_tracking_transparency: ^2.0.6
+  url_launcher: ^6.2.5
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

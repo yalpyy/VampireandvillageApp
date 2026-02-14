@@ -80,11 +80,6 @@ class _TermsScreenState extends State<TermsScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [AppTheme.primaryRed, Color(0xFF8B0000)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                         boxShadow: [
                           BoxShadow(
                             color: AppTheme.primaryRed.withOpacity(0.4),
@@ -93,8 +88,18 @@ class _TermsScreenState extends State<TermsScreen> {
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Text('🧛', style: TextStyle(fontSize: 40)),
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/images/app_icon.png',
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Text('🧛', style: TextStyle(fontSize: 40)),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -111,21 +116,32 @@ class _TermsScreenState extends State<TermsScreen> {
                   const SizedBox(height: AppTheme.spacingXxl),
                   // KVKK Section
                   _buildTermsCard(
-                    title: 'KVKK Aydınlatma Metni',
+                    title: 'KVKK Aydinlatma Metni ve Gizlilik Politikasi',
                     content:
-                        'Bu uygulama, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında kişisel verilerinizi işlememektedir. Uygulama tamamen çevrimdışı çalışır ve hiçbir kişisel veri sunucularımıza gönderilmez.\n\nUygulama içi satın alımlar için yalnızca uygulama mağazası (Google Play / App Store) tarafından işlenen ödeme bilgileri kullanılır.',
+                        'Bu uygulama, 6698 sayili Kisisel Verilerin Korunmasi Kanunu (KVKK) kapsaminda kisisel verilerinizi islememektedir. Uygulama tamamen cevrimdisi calisir ve hicbir kisisel veri sunucularimiza gonderilmez.\n\n'
+                        'Reklam Hizmeti: Uygulama, Google AdMob reklam hizmeti kullanmaktadir. AdMob, reklam gosterimi amacli cihaz tanimlayicisi ve kullanim verisi toplayabilir. Bu veriler Google\'in gizlilik politikasi kapsaminda islenir.\n\n'
+                        'Uygulama Ici Satin Alimlar: Odeme islemleri yalnizca Apple App Store / Google Play tarafindan islenir. Odeme bilgileriniz tarafimizca gorulmez ve saklanmaz.\n\n'
+                        'Izleme Izni (iOS): iOS 14 ve uzeri cihazlarda, size daha uygun reklamlar gostermek icin izleme izni istenebilir. Bu izni reddedebilirsiniz; uygulama calismaya devam eder.\n\n'
+                        'Haklariniz: KVKK kapsaminda kisisel verilerinize erisim, duzeltme ve silme haklariniz bulunmaktadir.',
                     isAccepted: _kvkkAccepted,
-                    checkboxLabel: 'KVKK Aydınlatma Metnini okudum ve anladım',
+                    checkboxLabel: 'KVKK Aydinlatma Metnini okudum ve anladim',
                     onChanged: (v) => setState(() => _kvkkAccepted = v ?? false),
                   ),
                   const SizedBox(height: AppTheme.spacingMd),
                   // Terms Section
                   _buildTermsCard(
-                    title: 'Kullanım Koşulları',
+                    title: 'Kullanim Kosullari',
                     content:
-                        'Bu uygulamayı kullanarak aşağıdaki koşulları kabul etmiş olursunuz:\n\n• Uygulama yalnızca eğlence amaçlıdır\n• Premium özellikler tek seferlik satın alma ile açılır\n• Uygulama içi satın alımlar iade edilemez\n• Uygulama "olduğu gibi" sunulmaktadır\n• Geliştirici, uygulamanın kullanımından doğabilecek zararlardan sorumlu değildir',
+                        'Bu uygulamayi kullanarak asagidaki kosullari kabul etmis olursunuz:\n\n'
+                        '- Uygulama yalnizca eglence amaclidir\n'
+                        '- Premium ozellikler tek seferlik satin alma ile acilir\n'
+                        '- Uygulama ici satin alimlar Apple/Google iade politikalarina tabidir\n'
+                        '- Uygulama icerisinde reklam gosterimi yapilmaktadir\n'
+                        '- Uygulama "oldugu gibi" sunulmaktadir\n'
+                        '- Gelistirici, uygulamanin kullanimindan dogabilecek zararlardan sorumlu degildir\n'
+                        '- Uygulama 12 yas ve uzeri kullanicilar icin uygundur',
                     isAccepted: _termsAccepted,
-                    checkboxLabel: 'Kullanım Koşullarını kabul ediyorum',
+                    checkboxLabel: 'Kullanim Kosullarini kabul ediyorum',
                     onChanged: (v) => setState(() => _termsAccepted = v ?? false),
                   ),
                   const SizedBox(height: AppTheme.spacingXl),

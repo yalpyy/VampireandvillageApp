@@ -9,4 +9,8 @@ Future<void> initializeAds() async {}
 
 Future<void> loadBanner() async {}
 
+Future<void> loadInterstitial() async {}
+
+Future<void> showInterstitial() async {}
+
 void disposeAds() {}

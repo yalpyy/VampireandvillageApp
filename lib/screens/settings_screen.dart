@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/game_provider.dart';
+import '../services/purchase_service.dart';
 import '../utils/localization_helper.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -68,10 +70,28 @@ class SettingsScreen extends StatelessWidget {
               icon: Icons.restore,
               title: l.restorePurchases,
               onTap: () async {
-                // TODO: Call purchase service restore
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l.purchaseRestored)),
-                );
+                final restored = await PurchaseService().restorePurchases();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        restored ? l.purchaseRestored : l.noPurchasesToRestore,
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+            // Privacy Policy
+            _buildSettingCard(
+              icon: Icons.privacy_tip_outlined,
+              title: 'Gizlilik Politikasi',
+              onTap: () async {
+                final uri = Uri.parse('https://vampireparty.github.io/privacy-policy');
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                }
               },
             ),
             const SizedBox(height: 16),

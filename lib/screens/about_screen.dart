@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/game_provider.dart';
 import '../services/admin_override_service.dart';
 import '../utils/localization_helper.dart';
@@ -129,11 +130,6 @@ class _AboutScreenState extends State<AboutScreen> {
                     height: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFE94560), Color(0xFF8B0000)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFFE94560).withOpacity(0.4),
@@ -142,10 +138,17 @@ class _AboutScreenState extends State<AboutScreen> {
                         ),
                       ],
                     ),
-                    child: const Center(
-                      child: Text(
-                        '🧛',
-                        style: TextStyle(fontSize: 50),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/images/app_icon.png',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Text('🧛', style: TextStyle(fontSize: 50)),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -195,6 +198,44 @@ class _AboutScreenState extends State<AboutScreen> {
                       ],
                     ),
                   ),
+                const SizedBox(height: 32),
+                // Gizlilik Politikasi
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('https://vampireparty.github.io/privacy-policy');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: const Text(
+                    'Gizlilik Politikasi',
+                    style: TextStyle(
+                      color: Color(0xFFE94560),
+                      fontSize: 14,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Color(0xFFE94560),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Kullanim Kosullari
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('https://vampireparty.github.io/terms');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: const Text(
+                    'Kullanim Kosullari',
+                    style: TextStyle(
+                      color: Color(0xFFE94560),
+                      fontSize: 14,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Color(0xFFE94560),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

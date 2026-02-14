@@ -1,25 +1,18 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'providers/game_provider.dart';
 import 'services/services.dart';
 import 'screens/screens.dart';
 import 'utils/app_theme.dart';
+import 'utils/att_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // iOS 14+ ATT izni iste (reklamlardan ONCE)
-  if (!kIsWeb && Platform.isIOS) {
-    final status = await AppTrackingTransparency.trackingAuthorizationStatus;
-    if (status == TrackingStatus.notDetermined) {
-      await Future.delayed(const Duration(seconds: 1));
-      await AppTrackingTransparency.requestTrackingAuthorization();
-    }
-  }
+  await AttHelper.requestTrackingIfNeeded();
 
   // Initialize services
   try {

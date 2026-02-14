@@ -16,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  late Animation<double> _glowAnimation;
 
   @override
   void initState() {
@@ -27,10 +26,6 @@ class _HomeScreenState extends State<HomeScreen>
     )..repeat(reverse: true);
 
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    _glowAnimation = Tween<double>(begin: 0.3, end: 0.6).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -59,9 +54,9 @@ class _HomeScreenState extends State<HomeScreen>
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withOpacity(0.4),
-                  Colors.black.withOpacity(0.7),
-                  Colors.black.withOpacity(0.85),
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.5),
+                  Colors.black.withOpacity(0.75),
                 ],
                 stops: const [0.0, 0.5, 1.0],
               ),
@@ -79,10 +74,7 @@ class _HomeScreenState extends State<HomeScreen>
               padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXl),
               child: Column(
                 children: [
-                  const Spacer(flex: 2),
-                  // Logo
-                  _buildLogo(),
-                  const SizedBox(height: AppTheme.spacingXl),
+                  const Spacer(flex: 3),
                   // Title
                   Text(
                     l.appTitle,
@@ -109,13 +101,13 @@ class _HomeScreenState extends State<HomeScreen>
                       fontWeight: FontWeight.w300,
                     ),
                   ),
-                  const Spacer(flex: 2),
+                  const Spacer(flex: 3),
                   // Start button
                   _buildStartButton(gameProvider),
                   const SizedBox(height: AppTheme.spacingXxl),
-                  const Spacer(),
                   // Banner Ad
                   if (gameProvider.adsEnabled) const AdBannerWidget(),
+                  const SizedBox(height: AppTheme.spacingMd),
                 ],
               ),
             ),
@@ -130,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen>
       'assets/images/home_background.png',
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        // Fallback gradient if image not found
         return Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -161,46 +152,6 @@ class _HomeScreenState extends State<HomeScreen>
         color: Colors.white.withOpacity(0.8),
         iconSize: 26,
       ),
-    );
-  }
-
-  Widget _buildLogo() {
-    return AnimatedBuilder(
-      animation: _glowAnimation,
-      builder: (context, child) {
-        return Container(
-          width: 140,
-          height: 140,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [AppTheme.primaryRed, Color(0xFF8B0000)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primaryRed.withOpacity(_glowAnimation.value),
-                blurRadius: 50,
-                spreadRadius: 15,
-              ),
-            ],
-          ),
-          child: ClipOval(
-            child: Image.asset(
-              'assets/images/app_icon.png',
-              width: 140,
-              height: 140,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Text('🧛', style: TextStyle(fontSize: 70)),
-                );
-              },
-            ),
-          ),
-        );
-      },
     );
   }
 

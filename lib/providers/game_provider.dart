@@ -163,8 +163,16 @@ class GameProvider with ChangeNotifier {
     }
   }
 
+  void markPlayerSawRole(String playerId) {
+    final index = _state.players.indexWhere((p) => p.id == playerId);
+    if (index != -1) {
+      _state.players[index].hasSeenRole = true;
+      notifyListeners();
+    }
+  }
+
   bool get allPlayersRevealed =>
-      _state.currentRevealIndex >= _state.players.length;
+      _state.players.isNotEmpty && _state.players.every((p) => p.hasSeenRole);
 
   // Night Phase - Simplified for moderator mode
   void startNight() {

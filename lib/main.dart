@@ -83,7 +83,7 @@ class _VampirePartyAppState extends State<VampirePartyApp> {
               '/home': (_) => const HomeScreen(),
               '/player-setup': (_) => const PlayerSetupScreen(),
               '/role-setup': (_) => const RoleSetupScreen(),
-              '/role-reveal': (_) => const RoleRevealScreen(),
+              '/role-reveal': (_) => const RoleRevealListScreen(),
               '/admin-control': (_) => const AdminControlScreen(),
               '/moderator': (_) => const ModeratorScreen(),
               '/night': (_) => const NightScreen(),

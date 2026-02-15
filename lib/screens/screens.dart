@@ -1,6 +1,7 @@
 export 'player_setup_screen.dart';
 export 'role_setup_screen.dart';
 export 'role_reveal_screen.dart';
+export 'role_reveal_list_screen.dart';
 export 'admin_control_screen.dart';
 export 'night_screen.dart';
 export 'day_screen.dart';

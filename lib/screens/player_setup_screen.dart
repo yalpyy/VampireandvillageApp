@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
-import '../utils/app_theme.dart';
+import '../widgets/gothic_ui.dart';
 import '../utils/localization_helper.dart';
 
 class PlayerSetupScreen extends StatefulWidget {
@@ -38,107 +38,110 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     final l = LocalizationHelper.of(context);
 
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
-      appBar: AppBar(
-        backgroundColor: AppTheme.cardBg,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
-        ),
-        title: Text(l.playerSetup),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: AppTheme.spacingSm),
-            decoration: BoxDecoration(
-              color: AppTheme.surfaceBg.withOpacity(0.5),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.settings_outlined, size: 22),
-              onPressed: () => Navigator.pushNamed(context, '/settings'),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppTheme.spacingLg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: GothicBackground(
+        child: Column(
+          children: [
+            GothicHeaderBanner(
+              title: 'OYUNCU SE\u00C7\u0130M\u0130',
+              subtitle: 'OYUNCU SAYISI',
+              leading: Row(
                 children: [
-                  // Player count card
-                  _buildPlayerCountCard(players.length, l),
-                  const SizedBox(height: AppTheme.spacingLg),
-                  // Add player input
-                  _buildAddPlayerCard(l),
-                  const SizedBox(height: AppTheme.spacingLg),
-                  // Player list
-                  if (players.isNotEmpty) ...[
-                    Text(
-                      'OYUNCULAR',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2,
-                      ),
-                    ),
-                    const SizedBox(height: AppTheme.spacingSm),
-                    ...players.asMap().entries.map((entry) => 
-                      _buildPlayerCard(entry.key + 1, entry.value, gameProvider)
-                    ),
-                  ],
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new,
+                        color: GothicColors.goldPrimary, size: 20),
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/home'),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.settings_outlined,
+                        color: GothicColors.goldPrimary, size: 22),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/settings'),
+                  ),
                 ],
               ),
             ),
-          ),
-          // Bottom CTA
-          _buildBottomCTA(players.length, l),
-        ],
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Player count display
+                    _buildCountDisplay(players.length),
+                    const SizedBox(height: 16),
+                    // Add player input
+                    _buildAddPlayerInput(l),
+                    const SizedBox(height: 20),
+                    // Player list
+                    if (players.isNotEmpty) ...[
+                      _buildSectionLabel('OYUNCULAR'),
+                      const SizedBox(height: 8),
+                      FramedPanel(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: Column(
+                          children: players.asMap().entries.map((entry) {
+                            final isLast =
+                                entry.key == players.length - 1;
+                            return _buildPlayerRow(
+                              entry.key + 1,
+                              entry.value,
+                              gameProvider,
+                              showDivider: !isLast,
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 80),
+                  ],
+                ),
+              ),
+            ),
+            // Bottom CTA
+            StickyCtaBar(
+              label: l.continueButton.toUpperCase(),
+              icon: Icons.arrow_forward_rounded,
+              enabled: players.length >= 3,
+              onTap: () => Navigator.pushNamed(context, '/role-setup'),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPlayerCountCard(int count, LocalizationHelper l) {
-    return Container(
-      padding: const EdgeInsets.all(AppTheme.spacingLg),
-      decoration: BoxDecoration(
-        gradient: AppTheme.cardGradient,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+  Widget _buildCountDisplay(int count) {
+    final isValid = count >= 3;
+    return FramedPanel(
       child: Column(
         children: [
           Text(
             'TOPLAM OYUNCU',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: GothicColors.goldPrimary.withOpacity(0.5),
               fontSize: 12,
               letterSpacing: 2,
             ),
           ),
-          const SizedBox(height: AppTheme.spacingSm),
+          const SizedBox(height: 8),
           Text(
             '$count',
             style: const TextStyle(
-              color: Colors.white,
+              color: GothicColors.goldLight,
               fontSize: 48,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: AppTheme.spacingXs),
+          const SizedBox(height: 4),
           Text(
-            count < 3 ? 'En az 3 oyuncu gerekli' : 'Oyuncu ekleyebilirsiniz',
+            isValid ? 'Oyuncu ekleyebilirsiniz' : 'En az 3 oyuncu gerekli',
             style: TextStyle(
-              color: count < 3 ? Colors.orange : Colors.green,
+              color: isValid
+                  ? const Color(0xFF4ADE80)
+                  : const Color(0xFFFBBF24),
               fontSize: 13,
             ),
           ),
@@ -147,12 +150,14 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     );
   }
 
-  Widget _buildAddPlayerCard(LocalizationHelper l) {
+  Widget _buildAddPlayerInput(LocalizationHelper l) {
     return Container(
-      padding: const EdgeInsets.all(AppTheme.spacingMd),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.cardBg,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        color: GothicColors.bgCard,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: GothicColors.goldPrimary.withOpacity(0.15)),
       ),
       child: Row(
         children: [
@@ -160,38 +165,34 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
             child: TextField(
               controller: _nameController,
               focusNode: _focusNode,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style:
+                  const TextStyle(color: GothicColors.goldLight, fontSize: 16),
               decoration: InputDecoration(
                 hintText: l.playerName,
                 prefixIcon: Icon(
                   Icons.person_add_outlined,
-                  color: Colors.white.withOpacity(0.5),
+                  color: GothicColors.goldPrimary.withOpacity(0.5),
                 ),
-                filled: true,
-                fillColor: AppTheme.surfaceBg,
               ),
               onSubmitted: (_) => _addPlayer(),
               textCapitalization: TextCapitalization.words,
             ),
           ),
-          const SizedBox(width: AppTheme.spacingSm),
+          const SizedBox(width: 10),
           Container(
             decoration: BoxDecoration(
-              color: AppTheme.primaryRed,
-              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primaryRed.withOpacity(0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              gradient: const LinearGradient(
+                colors: [GothicColors.crimson, GothicColors.crimsonDark],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                  color: GothicColors.goldPrimary.withOpacity(0.3)),
             ),
             child: IconButton(
               onPressed: _addPlayer,
-              icon: const Icon(Icons.add, color: Colors.white),
-              iconSize: 28,
-              padding: const EdgeInsets.all(AppTheme.spacingSm),
+              icon: const Icon(Icons.add, color: GothicColors.goldLight),
+              iconSize: 26,
+              padding: const EdgeInsets.all(10),
             ),
           ),
         ],
@@ -199,101 +200,95 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     );
   }
 
-  Widget _buildPlayerCard(int index, player, GameProvider gameProvider) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppTheme.spacingSm),
-      decoration: BoxDecoration(
-        color: AppTheme.surfaceBg,
-        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.05),
-        ),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.spacingMd,
-          vertical: AppTheme.spacingXs,
-        ),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppTheme.darkPurple.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-          ),
-          child: Center(
-            child: Text(
-              '$index',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+  Widget _buildPlayerRow(
+      int index, player, GameProvider gameProvider,
+      {bool showDivider = true}) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            children: [
+              // Circular avatar
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      GothicColors.goldDark.withOpacity(0.4),
+                      GothicColors.bgSurface,
+                    ],
+                  ),
+                  border: Border.all(
+                      color: GothicColors.goldPrimary.withOpacity(0.3)),
+                ),
+                child: Center(
+                  child: Text(
+                    '$index',
+                    style: const TextStyle(
+                      color: GothicColors.goldLight,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  player.name,
+                  style: const TextStyle(
+                    color: GothicColors.goldLight,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => gameProvider.removePlayer(player.id),
+                icon: Icon(
+                  Icons.close_rounded,
+                  color: Colors.red.withOpacity(0.7),
+                  size: 20,
+                ),
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
           ),
         ),
-        title: Text(
-          player.name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+        if (showDivider)
+          Divider(
+            height: 1,
+            color: GothicColors.goldPrimary.withOpacity(0.08),
           ),
-        ),
-        trailing: IconButton(
-          onPressed: () => gameProvider.removePlayer(player.id),
-          icon: Icon(
-            Icons.remove_circle_outline,
-            color: Colors.red.withOpacity(0.8),
-          ),
-        ),
-      ),
+      ],
     );
   }
 
-  Widget _buildBottomCTA(int playerCount, LocalizationHelper l) {
-    final canContinue = playerCount >= 3;
-
-    return Container(
-      padding: EdgeInsets.only(
-        left: AppTheme.spacingLg,
-        right: AppTheme.spacingLg,
-        top: AppTheme.spacingMd,
-        bottom: MediaQuery.of(context).padding.bottom + AppTheme.spacingMd,
-      ),
-      decoration: BoxDecoration(
-        color: AppTheme.cardBg,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
+  Widget _buildSectionLabel(String text) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 16,
+          decoration: BoxDecoration(
+            color: GothicColors.goldPrimary,
+            borderRadius: BorderRadius.circular(2),
           ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: canContinue
-            ? () => Navigator.pushNamed(context, '/role-setup')
-            : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: canContinue ? AppTheme.primaryRed : Colors.grey.shade700,
-          disabledBackgroundColor: Colors.grey.shade800,
-          minimumSize: const Size(double.infinity, AppTheme.buttonHeightLg),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          ),
-          elevation: canContinue ? 4 : 0,
         ),
-        child: Text(
-          l.continueButton.toUpperCase(),
+        const SizedBox(width: 8),
+        Text(
+          text,
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-            color: canContinue ? Colors.white : Colors.white38,
+            color: GothicColors.goldPrimary.withOpacity(0.6),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 2,
           ),
         ),
-      ),
+      ],
     );
   }
 }

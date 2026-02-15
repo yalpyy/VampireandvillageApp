@@ -11,83 +11,124 @@ class RoleSetupScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gameProvider = context.watch<GameProvider>();
+    final gp = context.watch<GameProvider>();
     final l = LocalizationHelper.of(context);
-    final totalRoles = gameProvider.state.totalRoles;
-    final playerCount = gameProvider.state.playerCount;
+    final totalRoles = gp.state.totalRoles;
+    final playerCount = gp.state.playerCount;
     final rolesMatch = totalRoles == playerCount;
 
     return Scaffold(
       body: GothicBackground(
         child: Column(
           children: [
+            // ── Header ─────────────────────────────
             GothicHeaderBanner(
               title: 'ROL SE\u00C7\u0130M\u0130',
-              subtitle: '$playerCount oyuncu / $totalRoles rol',
+              subtitle: 'OYUNCU SAYISI',
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new,
                     color: GothicColors.goldPrimary, size: 20),
                 onPressed: () => Navigator.pop(context),
               ),
+              statusWidget: _buildStatusChip(playerCount, totalRoles, rolesMatch),
             ),
-            // Warning bar
+
+            // ── Warning if mismatch ────────────────
             if (!rolesMatch) _buildWarningBar(l),
-            // Scrollable role list
+
+            // ── Scrollable body ────────────────────
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionLabel(l.freeRoles, GothicColors.goldLight),
-                    const SizedBox(height: 8),
-                    FramedPanel(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 12),
-                      child: Column(
-                        children: Role.freeRoles.asMap().entries.map((entry) {
-                          return _buildRoleRow(
-                            context,
-                            entry.value,
-                            gameProvider,
-                            l,
-                            showDivider: entry.key < Role.freeRoles.length - 1,
-                          );
-                        }).toList(),
-                      ),
-                    ),
+                    // player count card
+                    _buildPlayerCountCard(playerCount, totalRoles, rolesMatch),
                     const SizedBox(height: 20),
-                    _buildSectionLabel(l.premiumRoles, const Color(0xFFFBBF24)),
-                    const SizedBox(height: 8),
+
+                    // free roles
+                    _buildSectionDivider(l.freeRoles),
+                    const SizedBox(height: 10),
                     FramedPanel(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 12),
+                          vertical: 6, horizontal: 10),
                       child: Column(
                         children:
-                            Role.premiumRoles.asMap().entries.map((entry) {
-                          return _buildRoleRow(
-                            context,
-                            entry.value,
-                            gameProvider,
-                            l,
+                            Role.freeRoles.asMap().entries.map((entry) {
+                          final role = entry.value;
+                          final count = gp.getRoleCount(role.type);
+                          return OrnateRoleRow(
+                            iconEmoji: role.iconPath,
+                            name: l.getRoleName(role.nameKey),
+                            description: l.getRoleDesc(role.descKey),
+                            count: count,
+                            onMinus: count > 0
+                                ? () => gp.setRoleCount(
+                                    role.type, count - 1)
+                                : null,
+                            onPlus: () =>
+                                gp.setRoleCount(role.type, count + 1),
                             showDivider:
-                                entry.key < Role.premiumRoles.length - 1,
+                                entry.key < Role.freeRoles.length - 1,
                           );
                         }).toList(),
                       ),
                     ),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 24),
+
+                    // premium roles
+                    _buildSectionDivider(l.premiumRoles),
+                    const SizedBox(height: 10),
+                    FramedPanel(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 10),
+                      child: Column(
+                        children: Role.premiumRoles
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final role = entry.value;
+                          final isLocked = role.isPremium && !gp.isPremium;
+                          final count = gp.getRoleCount(role.type);
+                          return OrnateRoleRow(
+                            iconEmoji: role.iconPath,
+                            name: l.getRoleName(role.nameKey),
+                            description: l.getRoleDesc(role.descKey),
+                            count: count,
+                            isLocked: isLocked,
+                            onMinus: count > 0
+                                ? () => gp.setRoleCount(
+                                    role.type, count - 1)
+                                : null,
+                            onPlus: () =>
+                                gp.setRoleCount(role.type, count + 1),
+                            onLockedTap: () => showDialog(
+                              context: context,
+                              builder: (_) => const PaywallDialog(),
+                            ),
+                            showDivider: entry.key <
+                                Role.premiumRoles.length - 1,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    // space for CTA
+                    const SizedBox(height: 90),
                   ],
                 ),
               ),
             ),
-            // Sticky CTA
+
+            // ── Sticky CTA ────────────────────────
             StickyCtaBar(
-              label: rolesMatch ? 'ROLLER\u0130 DA\u011eIT' : 'ROL SAYISI E\u015e\u0130T DE\u011e\u0130L',
+              label: rolesMatch
+                  ? 'ROLLER\u0130 DA\u011eIT'
+                  : 'ROL SAYISI E\u015e\u0130T DE\u011e\u0130L',
               icon: rolesMatch ? Icons.play_arrow_rounded : Icons.block,
               enabled: rolesMatch,
               onTap: () {
-                gameProvider.proceedToRoleDistribution();
+                gp.proceedToRoleDistribution();
                 Navigator.pushNamed(context, '/role-reveal');
               },
             ),
@@ -97,26 +138,63 @@ class RoleSetupScreen extends StatelessWidget {
     );
   }
 
+  // ── status chip inside header ──────────────────
+
+  Widget _buildStatusChip(int players, int roles, bool match) {
+    final color = match ? const Color(0xFF4ADE80) : const Color(0xFFFBBF24);
+    final icon = match ? Icons.check_circle : Icons.info_outline;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            '$players oyuncu / $roles rol',
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── warning bar ────────────────────────────────
+
   Widget _buildWarningBar(LocalizationHelper l) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFFFBBF24).withOpacity(0.1),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFFBBF24).withOpacity(0.08),
+            Colors.transparent,
+          ],
+        ),
         border: Border(
           bottom: BorderSide(
-              color: const Color(0xFFFBBF24).withOpacity(0.2)),
+            color: const Color(0xFFFBBF24).withOpacity(0.15),
+          ),
         ),
       ),
       child: Row(
         children: [
           const Icon(Icons.warning_amber_rounded,
-              color: Color(0xFFFBBF24), size: 20),
+              color: Color(0xFFFBBF24), size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               l.totalRolesMustMatch,
-              style: const TextStyle(
-                  color: Color(0xFFFBBF24), fontSize: 13),
+              style: const TextStyle(color: Color(0xFFFBBF24), fontSize: 12),
             ),
           ),
         ],
@@ -124,164 +202,163 @@ class RoleSetupScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionLabel(String text, Color color) {
+  // ── player count card ──────────────────────────
+
+  Widget _buildPlayerCountCard(int players, int roles, bool match) {
+    return FramedPanel(
+      child: Column(
+        children: [
+          Text(
+            'TOPLAM OYUNCU',
+            style: TextStyle(
+              color: GothicColors.goldPrimary.withOpacity(0.5),
+              fontSize: 11,
+              letterSpacing: 2,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '$players',
+            style: const TextStyle(
+              color: GothicColors.goldLight,
+              fontSize: 44,
+              fontWeight: FontWeight.bold,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Oyuncu',
+            style: TextStyle(
+              color: GothicColors.goldPrimary.withOpacity(0.5),
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 10),
+          GothicHeaderBanner.buildOrnamentalDivider(opacity: 0.25),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildCountPill('$players', 'Oyuncu',
+                  GothicColors.goldPrimary.withOpacity(0.4)),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(
+                  match ? Icons.check_circle : Icons.close,
+                  color: match
+                      ? const Color(0xFF4ADE80)
+                      : const Color(0xFFEF4444),
+                  size: 20,
+                ),
+              ),
+              _buildCountPill('$roles', 'Rol',
+                  match
+                      ? const Color(0xFF4ADE80).withOpacity(0.3)
+                      : const Color(0xFFEF4444).withOpacity(0.3)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountPill(String value, String label, Color borderColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: GothicColors.bgSurface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              color: GothicColors.goldLight,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: GothicColors.goldPrimary.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── ornamental section divider ─────────────────
+
+  Widget _buildSectionDivider(String label) {
     return Row(
       children: [
-        Container(
-          width: 4,
-          height: 16,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(2),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  GothicColors.goldPrimary.withOpacity(0.25),
+                ],
+              ),
+            ),
           ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          text.toUpperCase(),
-          style: TextStyle(
-            color: color,
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '\u25C6 ',
+                style: TextStyle(
+                  color: GothicColors.goldPrimary.withOpacity(0.5),
+                  fontSize: 8,
+                ),
+              ),
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: GothicColors.goldPrimary.withOpacity(0.65),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+              Text(
+                ' \u25C6',
+                style: TextStyle(
+                  color: GothicColors.goldPrimary.withOpacity(0.5),
+                  fontSize: 8,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  GothicColors.goldPrimary.withOpacity(0.25),
+                  Colors.transparent,
+                ],
+              ),
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildRoleRow(
-    BuildContext context,
-    Role role,
-    GameProvider gameProvider,
-    LocalizationHelper l, {
-    bool showDivider = true,
-  }) {
-    final isPremium = gameProvider.isPremium;
-    final isLocked = role.isPremium && !isPremium;
-    final count = gameProvider.getRoleCount(role.type);
-
-    return GestureDetector(
-      onTap: isLocked
-          ? () => showDialog(
-                context: context,
-                builder: (_) => const PaywallDialog(),
-              )
-          : null,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Row(
-              children: [
-                // Role icon
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: isLocked
-                        ? Colors.grey.withOpacity(0.15)
-                        : GothicColors.bgSurface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isLocked
-                          ? Colors.grey.withOpacity(0.2)
-                          : GothicColors.goldPrimary.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      role.iconPath,
-                      style: const TextStyle(fontSize: 26),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                // Role info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            l.getRoleName(role.nameKey),
-                            style: TextStyle(
-                              color: isLocked
-                                  ? Colors.grey
-                                  : GothicColors.goldLight,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (isLocked) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFBBF24)
-                                    .withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.lock,
-                                      color: Color(0xFFFBBF24), size: 11),
-                                  SizedBox(width: 3),
-                                  Text(
-                                    'PRO',
-                                    style: TextStyle(
-                                      color: Color(0xFFFBBF24),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l.getRoleDesc(role.descKey),
-                        style: TextStyle(
-                          color: isLocked
-                              ? Colors.grey.shade700
-                              : GothicColors.goldPrimary.withOpacity(0.4),
-                          fontSize: 11,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                // Counter or lock
-                if (!isLocked)
-                  OrnateStepper(
-                    value: count,
-                    onMinus: count > 0
-                        ? () =>
-                            gameProvider.setRoleCount(role.type, count - 1)
-                        : null,
-                    onPlus: () =>
-                        gameProvider.setRoleCount(role.type, count + 1),
-                  )
-                else
-                  const Icon(Icons.lock_outline,
-                      color: Color(0xFFFBBF24), size: 22),
-              ],
-            ),
-          ),
-          if (showDivider)
-            Divider(
-              height: 1,
-              color: GothicColors.goldPrimary.withOpacity(0.08),
-            ),
-        ],
-      ),
     );
   }
 }

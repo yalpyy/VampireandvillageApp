@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Colors
+  // ── Gothic fantasy palette ──
   static const Color primaryRed = Color(0xFFE94560);
   static const Color darkPurple = Color(0xFF4A148C);
-  static const Color darkBlue = Color(0xFF0F3460);
-  static const Color darkBg = Color(0xFF1A1A2E);
-  static const Color darkerBg = Color(0xFF0D0D1A);
-  static const Color cardBg = Color(0xFF16213E);
-  static const Color surfaceBg = Color(0xFF0F3460);
+  static const Color darkBlue = Color(0xFF1A1040);
+  static const Color darkBg = Color(0xFF0D0816);
+  static const Color darkerBg = Color(0xFF08040F);
+  static const Color cardBg = Color(0xFF1E1233);
+  static const Color surfaceBg = Color(0xFF251742);
+
+  // Gold accents
+  static const Color goldPrimary = Color(0xFFC9A84C);
+  static const Color goldLight = Color(0xFFE8D48B);
+  static const Color goldDark = Color(0xFF8B6914);
+  static const Color crimson = Color(0xFFB91C1C);
 
   // Spacing
   static const double spacingXs = 8.0;
@@ -39,48 +45,51 @@ class AppTheme {
         primary: primaryRed,
         secondary: darkPurple,
         surface: cardBg,
-        background: darkBg,
         error: Colors.redAccent,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: cardBg,
+        backgroundColor: Color(0xFF1A0E2E),
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
-          color: Colors.white,
+          color: goldLight,
           fontSize: 18,
           fontWeight: FontWeight.w600,
+          letterSpacing: 1,
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: goldLight),
       ),
       cardTheme: CardThemeData(
-  color: surfaceBg,
-  elevation: 4,
-  shadowColor: Colors.black45,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(radiusMd),
-  ),
-),
+        color: cardBg,
+        elevation: 4,
+        shadowColor: Colors.black45,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusMd),
+          side: BorderSide(color: goldPrimary.withOpacity(0.15)),
+        ),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryRed,
-          foregroundColor: Colors.white,
+          backgroundColor: crimson,
+          foregroundColor: goldLight,
           elevation: 4,
-          shadowColor: primaryRed.withOpacity(0.4),
+          shadowColor: crimson.withOpacity(0.4),
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMd),
+            side: BorderSide(color: goldPrimary.withOpacity(0.3)),
           ),
           textStyle: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
+            letterSpacing: 1,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.white70,
-          side: const BorderSide(color: Colors.white38),
+          foregroundColor: goldLight,
+          side: BorderSide(color: goldPrimary.withOpacity(0.4)),
           minimumSize: const Size(double.infinity, buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusMd),
@@ -88,9 +97,7 @@ class AppTheme {
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: primaryRed,
-        ),
+        style: TextButton.styleFrom(foregroundColor: goldPrimary),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -101,39 +108,59 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: goldPrimary.withOpacity(0.15)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: goldPrimary.withOpacity(0.15)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusMd),
-          borderSide: const BorderSide(color: primaryRed, width: 2),
+          borderSide: BorderSide(color: goldPrimary.withOpacity(0.6), width: 2),
         ),
-        hintStyle: const TextStyle(color: Colors.white38),
+        hintStyle: TextStyle(color: goldLight.withOpacity(0.3)),
       ),
       chipTheme: ChipThemeData(
         backgroundColor: surfaceBg,
-        selectedColor: primaryRed,
-        labelStyle: const TextStyle(color: Colors.white),
+        selectedColor: crimson,
+        labelStyle: const TextStyle(color: goldLight),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: spacingSm, vertical: spacingXs),
+        padding:
+            const EdgeInsets.symmetric(horizontal: spacingSm, vertical: spacingXs),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: cardBg,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusLg)),
+          borderRadius:
+              const BorderRadius.vertical(top: Radius.circular(radiusLg)),
+          side: BorderSide(color: goldPrimary.withOpacity(0.2)),
         ),
       ),
-     dialogTheme: DialogThemeData(
-  backgroundColor: cardBg,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(radiusLg),
-  ),
-),
+      dialogTheme: DialogThemeData(
+        backgroundColor: cardBg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(radiusLg),
+          side: BorderSide(color: goldPrimary.withOpacity(0.2)),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return goldPrimary;
+          return Colors.grey;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return goldDark.withOpacity(0.5);
+          }
+          return Colors.grey.withOpacity(0.3);
+        }),
+      ),
+      listTileTheme: const ListTileThemeData(
+        textColor: goldLight,
+        iconColor: goldPrimary,
+      ),
     );
   }
 
@@ -157,13 +184,14 @@ class AppTheme {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [primaryRed, Color(0xFF8B0000)],
+          colors: [crimson, Color(0xFF7F1D1D)],
         ),
         borderRadius: BorderRadius.circular(radiusMd),
+        border: Border.all(color: goldPrimary.withOpacity(0.4)),
         boxShadow: [
           BoxShadow(
-            color: primaryRed.withOpacity(0.4),
-            blurRadius: 16,
+            color: crimson.withOpacity(0.3),
+            blurRadius: 12,
             spreadRadius: 2,
           ),
         ],

@@ -41,7 +41,7 @@ class SoundService {
   }
 
   Future<void> playRooster() async {
-    await _playSound('rooster.mp3');
+    await _playSound('rooster_crow.mp3');
   }
 
   Future<void> playTimesUp() async {

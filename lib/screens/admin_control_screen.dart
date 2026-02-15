@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
-import '../utils/app_theme.dart';
 import '../utils/localization_helper.dart';
+import '../widgets/gothic_ui.dart';
 
 class AdminControlScreen extends StatelessWidget {
   const AdminControlScreen({super.key});
@@ -13,21 +13,10 @@ class AdminControlScreen extends StatelessWidget {
     final l = LocalizationHelper.of(context);
 
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.darkPurple.withOpacity(0.2),
-              AppTheme.darkBg,
-            ],
-          ),
-        ),
+      body: GothicBackground(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingXl),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -37,55 +26,66 @@ class AdminControlScreen extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.15),
+                    color: const Color(0xFF166534).withOpacity(0.2),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.green.withOpacity(0.3),
+                      color: const Color(0xFF4ADE80).withOpacity(0.4),
                       width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4ADE80).withOpacity(0.1),
+                        blurRadius: 20,
+                      ),
+                    ],
                   ),
                   child: const Icon(
                     Icons.check_circle_outline,
                     size: 60,
-                    color: Colors.green,
+                    color: Color(0xFF4ADE80),
                   ),
                 ),
-                const SizedBox(height: AppTheme.spacingXl),
+                const SizedBox(height: 24),
                 Text(
                   l.allPlayersSawRoles,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: GothicColors.goldLight,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
                   ),
                 ),
-                const SizedBox(height: AppTheme.spacingSm),
+                const SizedBox(height: 12),
+                GothicHeaderBanner.buildOrnamentalDivider(),
+                const SizedBox(height: 12),
                 Text(
-                  'Moderatör ekranına geçmeye hazırsınız',
+                  'Moderat\u00f6r ekran\u0131na ge\u00e7meye haz\u0131rs\u0131n\u0131z',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: GothicColors.goldPrimary.withOpacity(0.6),
                     fontSize: 15,
                   ),
                 ),
-                const SizedBox(height: AppTheme.spacingMd),
+                const SizedBox(height: 20),
                 // Player summary
-                Container(
-                  padding: const EdgeInsets.all(AppTheme.spacingMd),
-                  decoration: BoxDecoration(
-                    color: AppTheme.surfaceBg.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                FramedPanel(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.people, color: Colors.white54, size: 20),
-                      const SizedBox(width: AppTheme.spacingXs),
+                      Icon(Icons.people,
+                          color: GothicColors.goldPrimary.withOpacity(0.7),
+                          size: 20),
+                      const SizedBox(width: 8),
                       Text(
-                        '${gameProvider.players.length} oyuncu hazır',
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        '${gameProvider.players.length} oyuncu haz\u0131r',
+                        style: TextStyle(
+                          color: GothicColors.goldPrimary.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -93,38 +93,14 @@ class AdminControlScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                // CTA Button
-                ElevatedButton(
-                  onPressed: () {
+                // CTA
+                StickyCtaBar(
+                  label: 'MODERAT\u00d6R EKRANINA GE\u00c7',
+                  icon: Icons.admin_panel_settings,
+                  onTap: () {
                     Navigator.pushReplacementNamed(context, '/moderator');
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryRed,
-                    minimumSize:
-                        const Size(double.infinity, AppTheme.buttonHeightLg),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-                    ),
-                    elevation: 6,
-                    shadowColor: AppTheme.primaryRed.withOpacity(0.5),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.admin_panel_settings, size: 24),
-                      SizedBox(width: AppTheme.spacingSm),
-                      Text(
-                        'MODERATÖR EKRANINA GEÇ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-                const SizedBox(height: AppTheme.spacingLg),
               ],
             ),
           ),

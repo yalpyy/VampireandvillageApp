@@ -61,7 +61,6 @@ class GameProvider with ChangeNotifier {
   }
 
   Future<void> setLocale(String value) async {
-    if (value == 'en' && !isPremium) return;
     _locale = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('locale', value);

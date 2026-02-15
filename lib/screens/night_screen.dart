@@ -4,6 +4,7 @@ import '../providers/game_provider.dart';
 import '../models/role.dart';
 import '../services/sound_service.dart';
 import '../utils/localization_helper.dart';
+import '../widgets/gothic_ui.dart';
 
 class NightScreen extends StatefulWidget {
   const NightScreen({super.key});
@@ -17,6 +18,22 @@ class _NightScreenState extends State<NightScreen> {
   String? _selectedPlayerId;
   String? _seerResult;
 
+  // Role-specific accent colors
+  Color _roleColor(RoleType type) {
+    switch (type) {
+      case RoleType.vampire:
+        return const Color(0xFFDC2626);
+      case RoleType.doctor:
+        return const Color(0xFF16A34A);
+      case RoleType.guard:
+        return const Color(0xFF2563EB);
+      case RoleType.seer:
+        return const Color(0xFF9333EA);
+      default:
+        return GothicColors.goldPrimary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
@@ -25,21 +42,22 @@ class _NightScreenState extends State<NightScreen> {
 
     final steps = _buildNightSteps(gameProvider, l);
 
-    // NO ADS on this screen - security rule
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D1A),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A0A2E),
-        title: Text(
-          '${l.nightPhase} - ${l.night} ${gameProvider.state.nightCount}',
-          style: const TextStyle(color: Colors.white),
+      body: GothicBackground(
+        child: Column(
+          children: [
+            GothicHeaderBanner(
+              title: l.nightPhase.toUpperCase(),
+              subtitle: '${l.night} ${gameProvider.state.nightCount}',
+            ),
+            Expanded(
+              child: steps.isEmpty
+                  ? _buildEndNight(context, gameProvider, l)
+                  : _buildNightStep(
+                      steps[_currentStep], alivePlayers, gameProvider, l),
+            ),
+          ],
         ),
-        automaticallyImplyLeading: false,
-      ),
-      body: SafeArea(
-        child: steps.isEmpty
-            ? _buildEndNight(context, gameProvider, l)
-            : _buildNightStep(steps[_currentStep], alivePlayers, gameProvider, l),
       ),
     );
   }
@@ -48,43 +66,35 @@ class _NightScreenState extends State<NightScreen> {
       GameProvider gameProvider, LocalizationHelper l) {
     final steps = <Map<String, dynamic>>[];
 
-    // Always have vampire action
     if (gameProvider.hasRole(RoleType.vampire)) {
       steps.add({
         'role': RoleType.vampire,
         'title': l.vampireSelectTarget,
-        'icon': '🧛',
-        'color': Colors.red,
+        'icon': '\u{1F9DB}',
       });
     }
 
-    // Doctor action
     if (gameProvider.hasRole(RoleType.doctor)) {
       steps.add({
         'role': RoleType.doctor,
         'title': l.doctorSelectProtection,
-        'icon': '💉',
-        'color': Colors.green,
+        'icon': '\u{1F489}',
       });
     }
 
-    // Guard action
     if (gameProvider.hasRole(RoleType.guard)) {
       steps.add({
         'role': RoleType.guard,
-        'title': 'Muhafız: Koruyacağın kişiyi seç',
-        'icon': '🛡️',
-        'color': Colors.blue,
+        'title': l.guardSelectProtection,
+        'icon': '\u{1F6E1}\uFE0F',
       });
     }
 
-    // Seer action
     if (gameProvider.hasRole(RoleType.seer)) {
       steps.add({
         'role': RoleType.seer,
         'title': l.seerPeekRole,
-        'icon': '🔮',
-        'color': Colors.purple,
+        'icon': '\u{1F52E}',
       });
     }
 
@@ -99,160 +109,156 @@ class _NightScreenState extends State<NightScreen> {
   ) {
     final roleType = step['role'] as RoleType;
     final actor = gameProvider.getAlivePlayerWithRole(roleType);
+    final color = _roleColor(roleType);
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: (step['color'] as Color).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: (step['color'] as Color).withOpacity(0.5),
-              ),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  step['icon'],
-                  style: const TextStyle(fontSize: 48),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  step['title'],
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (actor != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    '(${actor.name})',
-                    style: const TextStyle(
-                      color: Colors.white60,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ],
+    return Column(
+      children: [
+        // Role card
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: color.withOpacity(0.4),
             ),
           ),
-          if (_seerResult != null && roleType == RoleType.seer) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(12),
+          child: Column(
+            children: [
+              Text(
+                step['icon'],
+                style: const TextStyle(fontSize: 44),
               ),
-              child: Text(
-                _seerResult!,
+              const SizedBox(height: 10),
+              Text(
+                step['title'],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: GothicColors.goldLight,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ],
-          const SizedBox(height: 24),
-          Expanded(
-            child: ListView.builder(
-              itemCount: alivePlayers.length,
-              itemBuilder: (context, index) {
-                final player = alivePlayers[index];
-                // Skip self for doctor/guard protection
-                if ((roleType == RoleType.doctor || roleType == RoleType.guard) &&
-                    player.assignedRole?.type == roleType) {
-                  return const SizedBox();
-                }
-                // Guard can't protect same person consecutively
-                if (roleType == RoleType.guard &&
-                    player.id == gameProvider.state.nightActions.lastGuardProtectionId) {
-                  return const SizedBox();
-                }
-
-                final isSelected = _selectedPlayerId == player.id;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => _selectedPlayerId = player.id);
-                    if (roleType == RoleType.seer) {
-                      gameProvider.setSeerPeek(player.id);
-                      _seerResult = l.seerResult(
-                        player.name,
-                        l.getRoleName(player.assignedRole?.nameKey ?? 'unknown'),
-                      );
-                    }
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (step['color'] as Color).withOpacity(0.4)
-                          : const Color(0xFF1A1A2E),
-                      borderRadius: BorderRadius.circular(12),
-                      border: isSelected
-                          ? Border.all(color: step['color'], width: 2)
-                          : null,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          isSelected
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked,
-                          color: isSelected ? step['color'] : Colors.white38,
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          player.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
+              if (actor != null) ...[
+                const SizedBox(height: 6),
+                Text(
+                  '(${actor.name})',
+                  style: TextStyle(
+                    color: GothicColors.goldPrimary.withOpacity(0.6),
+                    fontSize: 13,
                   ),
-                );
-              },
-            ),
+                ),
+              ],
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => _proceedToNextStep(gameProvider, roleType),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: step['color'],
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+        ),
+        if (_seerResult != null && roleType == RoleType.seer)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF9333EA).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF9333EA).withOpacity(0.4),
               ),
             ),
             child: Text(
-              _currentStep < _buildNightSteps(gameProvider, l).length - 1
-                  ? l.continueButton
-                  : l.endNight,
+              _seerResult!,
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
+                color: GothicColors.goldLight,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-        ],
-      ),
+        // Player list
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: alivePlayers.length,
+            itemBuilder: (context, index) {
+              final player = alivePlayers[index];
+              if ((roleType == RoleType.doctor || roleType == RoleType.guard) &&
+                  player.assignedRole?.type == roleType) {
+                return const SizedBox();
+              }
+              if (roleType == RoleType.guard &&
+                  player.id ==
+                      gameProvider.state.nightActions.lastGuardProtectionId) {
+                return const SizedBox();
+              }
+
+              final isSelected = _selectedPlayerId == player.id;
+              return GestureDetector(
+                onTap: () {
+                  setState(() => _selectedPlayerId = player.id);
+                  if (roleType == RoleType.seer) {
+                    gameProvider.setSeerPeek(player.id);
+                    _seerResult = l.seerResult(
+                      player.name,
+                      l.getRoleName(
+                          player.assignedRole?.nameKey ?? 'unknown'),
+                    );
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? color.withOpacity(0.25)
+                        : GothicColors.bgCard,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? color.withOpacity(0.7)
+                          : GothicColors.goldPrimary.withOpacity(0.1),
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: isSelected
+                            ? color
+                            : GothicColors.goldPrimary.withOpacity(0.3),
+                      ),
+                      const SizedBox(width: 14),
+                      Text(
+                        player.name,
+                        style: TextStyle(
+                          color: isSelected
+                              ? GothicColors.goldLight
+                              : GothicColors.goldLight.withOpacity(0.8),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        // CTA
+        StickyCtaBar(
+          label: _currentStep <
+                  _buildNightSteps(gameProvider, l).length - 1
+              ? l.continueButton.toUpperCase()
+              : l.endNight.toUpperCase(),
+          onTap: () => _proceedToNextStep(gameProvider, roleType),
+        ),
+      ],
     );
   }
 
   void _proceedToNextStep(GameProvider gameProvider, RoleType currentRole) {
-    // Save the selection
     switch (currentRole) {
       case RoleType.vampire:
         gameProvider.setVampireTarget(_selectedPlayerId);
@@ -264,13 +270,13 @@ class _NightScreenState extends State<NightScreen> {
         gameProvider.setGuardProtection(_selectedPlayerId);
         break;
       case RoleType.seer:
-        // Already saved when selected
         break;
       default:
         break;
     }
 
-    final steps = _buildNightSteps(gameProvider, LocalizationHelper.of(context));
+    final steps =
+        _buildNightSteps(gameProvider, LocalizationHelper.of(context));
     if (_currentStep < steps.length - 1) {
       setState(() {
         _currentStep++;
@@ -278,7 +284,6 @@ class _NightScreenState extends State<NightScreen> {
         _seerResult = null;
       });
     } else {
-      // End night
       gameProvider.endNight();
       if (gameProvider.soundEnabled) {
         if (gameProvider.state.winner != null) {
@@ -301,30 +306,51 @@ class _NightScreenState extends State<NightScreen> {
   Widget _buildEndNight(
       BuildContext context, GameProvider gameProvider, LocalizationHelper l) {
     return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          gameProvider.endNight();
-          if (gameProvider.state.winner != null) {
-            Navigator.pushReplacementNamed(context, '/result');
-          } else {
-            Navigator.pushReplacementNamed(context, '/day');
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4A148C),
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 24),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            l.endNight,
+            style: const TextStyle(
+              color: GothicColors.goldLight,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        child: Text(
-          l.endNight,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+          const SizedBox(height: 24),
+          GestureDetector(
+            onTap: () {
+              gameProvider.endNight();
+              if (gameProvider.state.winner != null) {
+                Navigator.pushReplacementNamed(context, '/result');
+              } else {
+                Navigator.pushReplacementNamed(context, '/day');
+              }
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [GothicColors.crimson, GothicColors.crimsonDark],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: GothicColors.goldPrimary.withOpacity(0.4),
+                ),
+              ),
+              child: Text(
+                l.endNight.toUpperCase(),
+                style: const TextStyle(
+                  color: GothicColors.goldLight,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

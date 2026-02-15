@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../providers/game_provider.dart';
 import '../services/admin_override_service.dart';
 import '../utils/localization_helper.dart';
+import '../widgets/gothic_ui.dart';
 
 class AboutScreen extends StatefulWidget {
   const AboutScreen({super.key});
@@ -38,22 +39,41 @@ class _AboutScreenState extends State<AboutScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: GothicColors.bgCard,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: GothicColors.goldPrimary.withOpacity(0.3)),
+        ),
         title: Text(
           l.enterPin,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: GothicColors.goldLight),
         ),
         content: TextField(
           controller: pinController,
           keyboardType: TextInputType.number,
           obscureText: true,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: GothicColors.goldLight),
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF0F3460),
+            fillColor: GothicColors.bgSurface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: GothicColors.goldPrimary.withOpacity(0.2),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: GothicColors.goldPrimary.withOpacity(0.2),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: GothicColors.goldPrimary.withOpacity(0.6),
+                width: 2,
+              ),
             ),
           ),
         ),
@@ -62,7 +82,7 @@ class _AboutScreenState extends State<AboutScreen> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               l.cancel,
-              style: const TextStyle(color: Colors.white70),
+              style: TextStyle(color: GothicColors.goldPrimary.withOpacity(0.7)),
             ),
           ),
           ElevatedButton(
@@ -74,7 +94,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(l.adminOverrideEnabled),
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.green.shade800,
                   ),
                 );
               } else {
@@ -82,17 +102,17 @@ class _AboutScreenState extends State<AboutScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(l.incorrectPin),
-                    backgroundColor: Colors.red,
+                    backgroundColor: GothicColors.crimson,
                   ),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE94560),
+              backgroundColor: GothicColors.crimson,
             ),
             child: Text(
               l.confirm,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: GothicColors.goldLight),
             ),
           ),
         ],
@@ -106,139 +126,155 @@ class _AboutScreenState extends State<AboutScreen> {
     final l = LocalizationHelper.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF16213E),
-        title: Text(l.about, style: const TextStyle(color: Colors.white)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Tappable Logo
-                GestureDetector(
-                  onTap: _onLogoTap,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFE94560).withOpacity(0.4),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/app_icon.png',
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Text('🧛', style: TextStyle(fontSize: 50)),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l.appTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${l.version} 1.0.0',
-                  style: const TextStyle(
-                    color: Colors.white60,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                if (gameProvider.isPremium)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.amber),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Premium',
-                          style: TextStyle(
-                            color: Colors.amber,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+      body: GothicBackground(
+        child: Column(
+          children: [
+            GothicHeaderBanner(
+              title: l.about.toUpperCase(),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    color: GothicColors.goldPrimary, size: 20),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Tappable Logo
+                      GestureDetector(
+                        onTap: _onLogoTap,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: GothicColors.crimson.withOpacity(0.4),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/app_icon.png',
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: GothicColors.bgCard,
+                                  child: const Center(
+                                    child: Text('\u{1F9DB}',
+                                        style: TextStyle(fontSize: 50)),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 32),
-                // Gizlilik Politikasi
-                GestureDetector(
-                  onTap: () async {
-                    final uri = Uri.parse('https://vampireparty.github.io/privacy-policy');
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                    }
-                  },
-                  child: const Text(
-                    'Gizlilik Politikasi',
-                    style: TextStyle(
-                      color: Color(0xFFE94560),
-                      fontSize: 14,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Color(0xFFE94560),
-                    ),
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        l.appTitle,
+                        style: const TextStyle(
+                          color: GothicColors.goldLight,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${l.version} 1.0.0',
+                        style: TextStyle(
+                          color: GothicColors.goldPrimary.withOpacity(0.6),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      if (gameProvider.isPremium)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: GothicColors.goldPrimary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: GothicColors.goldPrimary.withOpacity(0.5),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.star, color: GothicColors.goldPrimary),
+                              SizedBox(width: 8),
+                              Text(
+                                'Premium',
+                                style: TextStyle(
+                                  color: GothicColors.goldPrimary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 32),
+                      // Privacy Policy
+                      GestureDetector(
+                        onTap: () async {
+                          final uri = Uri.parse(
+                              'https://vampireparty.github.io/privacy-policy');
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri,
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: Text(
+                          l.privacyPolicy,
+                          style: TextStyle(
+                            color: GothicColors.goldPrimary,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                            decorationColor: GothicColors.goldPrimary.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Terms
+                      GestureDetector(
+                        onTap: () async {
+                          final uri = Uri.parse(
+                              'https://vampireparty.github.io/terms');
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri,
+                                mode: LaunchMode.externalApplication);
+                          }
+                        },
+                        child: Text(
+                          l.termsOfUse,
+                          style: TextStyle(
+                            color: GothicColors.goldPrimary,
+                            fontSize: 14,
+                            decoration: TextDecoration.underline,
+                            decorationColor: GothicColors.goldPrimary.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                // Kullanim Kosullari
-                GestureDetector(
-                  onTap: () async {
-                    final uri = Uri.parse('https://vampireparty.github.io/terms');
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                    }
-                  },
-                  child: const Text(
-                    'Kullanim Kosullari',
-                    style: TextStyle(
-                      color: Color(0xFFE94560),
-                      fontSize: 14,
-                      decoration: TextDecoration.underline,
-                      decorationColor: Color(0xFFE94560),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

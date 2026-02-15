@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../services/sound_service.dart';
 import '../utils/localization_helper.dart';
+import '../widgets/gothic_ui.dart';
 
 class DayScreen extends StatelessWidget {
   const DayScreen({super.key});
@@ -15,176 +16,164 @@ class DayScreen extends StatelessWidget {
     final logs = gameProvider.state.logs;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF16213E),
-        title: Text(
-          '${l.dayPhase} - ${l.day} ${gameProvider.state.nightCount}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        automaticallyImplyLeading: false,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Event Log
-              Container(
+      body: GothicBackground(
+        child: Column(
+          children: [
+            GothicHeaderBanner(
+              title: '${l.dayPhase}'.toUpperCase(),
+              subtitle: '${l.day} ${gameProvider.state.nightCount}',
+            ),
+            Expanded(
+              child: Padding(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0F3460),
-                  borderRadius: BorderRadius.circular(12),
-                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Event Log
+                    FramedPanel(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.history,
+                                  color: GothicColors.goldPrimary.withOpacity(0.7),
+                                  size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                l.eventLog,
+                                style: const TextStyle(
+                                  color: GothicColors.goldLight,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          if (logs.isEmpty)
+                            Text(
+                              '-',
+                              style: TextStyle(
+                                color: GothicColors.goldPrimary.withOpacity(0.3)),
+                            )
+                          else
+                            ...logs.reversed.take(5).map((log) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    '\u2022 $log',
+                                    style: TextStyle(
+                                      color: GothicColors.goldPrimary.withOpacity(0.7),
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Alive Players header
                     Row(
                       children: [
-                        const Icon(Icons.history, color: Colors.white70),
+                        const Icon(Icons.people, color: Color(0xFF4ADE80), size: 20),
                         const SizedBox(width: 8),
                         Text(
-                          l.eventLog,
+                          '${l.alivePlayers} (${alivePlayers.length})',
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
+                            color: GothicColors.goldLight,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    if (logs.isEmpty)
-                      const Text(
-                        '-',
-                        style: TextStyle(color: Colors.white38),
-                      )
-                    else
-                      ...logs.reversed.take(5).map((log) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Text(
-                              '• $log',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 14,
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: gameProvider.players.length,
+                        itemBuilder: (context, index) {
+                          final player = gameProvider.players[index];
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: player.isAlive
+                                  ? GothicColors.bgCard
+                                  : GothicColors.bgDeep.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: player.isAlive
+                                    ? GothicColors.goldPrimary.withOpacity(0.15)
+                                    : Colors.grey.withOpacity(0.1),
                               ),
                             ),
-                          )),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Alive Players
-              Row(
-                children: [
-                  const Icon(Icons.people, color: Colors.green),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${l.alivePlayers} (${alivePlayers.length})',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: gameProvider.players.length,
-                  itemBuilder: (context, index) {
-                    final player = gameProvider.players[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: player.isAlive
-                            ? const Color(0xFF0F3460)
-                            : const Color(0xFF2D2D2D),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            player.isAlive
-                                ? Icons.person
-                                : Icons.person_off,
-                            color:
-                                player.isAlive ? Colors.green : Colors.grey,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            player.name,
-                            style: TextStyle(
-                              color:
-                                  player.isAlive ? Colors.white : Colors.grey,
-                              fontSize: 16,
-                              decoration: player.isAlive
-                                  ? null
-                                  : TextDecoration.lineThrough,
-                            ),
-                          ),
-                          if (!player.isAlive) ...[
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                l.dead,
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  player.isAlive
+                                      ? Icons.person
+                                      : Icons.person_off,
+                                  color: player.isAlive
+                                      ? const Color(0xFF4ADE80)
+                                      : Colors.grey.shade600,
+                                  size: 20,
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    player.name,
+                                    style: TextStyle(
+                                      color: player.isAlive
+                                          ? GothicColors.goldLight
+                                          : Colors.grey.shade600,
+                                      fontSize: 15,
+                                      decoration: player.isAlive
+                                          ? null
+                                          : TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                ),
+                                if (!player.isAlive)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: GothicColors.crimson.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      l.dead,
+                                      style: const TextStyle(
+                                        color: Color(0xFFFCA5A5),
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                          ],
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (gameProvider.soundEnabled) {
-                    SoundService().playVoteStart();
-                  }
-                  gameProvider.startVoting();
-                  Navigator.pushReplacementNamed(context, '/vote');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE94560),
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.how_to_vote, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Text(
-                      l.startVoting,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            StickyCtaBar(
+              label: l.startVoting.toUpperCase(),
+              icon: Icons.how_to_vote,
+              onTap: () {
+                if (gameProvider.soundEnabled) {
+                  SoundService().playVoteStart();
+                }
+                gameProvider.startVoting();
+                Navigator.pushReplacementNamed(context, '/vote');
+              },
+            ),
+          ],
         ),
       ),
     );

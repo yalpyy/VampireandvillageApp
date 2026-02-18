@@ -84,7 +84,7 @@ class _RoleRevealScreenState extends State<RoleRevealScreen>
                         // Team badge
                         RoleBadge(
                           icon: role.iconPath,
-                          name: isEvil ? 'K\u00d6T\u00dc TARAF' : '\u0130Y\u0130 TARAF',
+                          name: isEvil ? l.evilTeam : l.goodTeam,
                           isEvil: isEvil,
                         ),
                       ],

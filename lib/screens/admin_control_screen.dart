@@ -60,7 +60,7 @@ class AdminControlScreen extends StatelessWidget {
                 GothicHeaderBanner.buildOrnamentalDivider(),
                 const SizedBox(height: 12),
                 Text(
-                  'Moderat\u00f6r ekran\u0131na ge\u00e7meye haz\u0131rs\u0131n\u0131z',
+                  l.readyForModerator,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: GothicColors.goldPrimary.withOpacity(0.6),
@@ -83,7 +83,7 @@ class AdminControlScreen extends StatelessWidget {
                           size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        '${gameProvider.players.length} oyuncu haz\u0131r',
+                        l.playersReady(gameProvider.players.length),
                         style: TextStyle(
                           color: GothicColors.goldPrimary.withOpacity(0.7),
                           fontSize: 14,
@@ -95,7 +95,7 @@ class AdminControlScreen extends StatelessWidget {
                 const Spacer(),
                 // CTA
                 StickyCtaBar(
-                  label: 'MODERAT\u00d6R EKRANINA GE\u00c7',
+                  label: l.goToModerator,
                   icon: Icons.admin_panel_settings,
                   onTap: () {
                     Navigator.pushReplacementNamed(context, '/moderator');

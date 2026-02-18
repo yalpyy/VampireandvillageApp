@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/player.dart';
 import '../models/role.dart';
 import '../models/game_state.dart';
+import '../utils/localization_helper.dart';
 
 class GameProvider with ChangeNotifier {
   GameState _state = GameState();
@@ -192,7 +193,7 @@ class GameProvider with ChangeNotifier {
     if (playerIndex != -1 && _state.players[playerIndex].isAlive) {
       _state.players[playerIndex].isAlive = false;
       final playerName = _state.players[playerIndex].name;
-      _state.logs.add('${_state.players[playerIndex].name} öldü');
+      _state.logs.add(LogStrings.playerDied(_locale, playerName));
       notifyListeners();
     }
   }
@@ -245,13 +246,13 @@ class GameProvider with ChangeNotifier {
         if (targetIndex != -1) {
           _state.players[targetIndex].isAlive = false;
           final playerName = _state.players[targetIndex].name;
-          _state.logs.add('Gece ${_state.nightCount}: $playerName öldü');
+          _state.logs.add(LogStrings.nightPlayerDied(_locale, _state.nightCount, playerName));
         }
       } else {
-        _state.logs.add('Gece ${_state.nightCount}: Kimse ölmedi');
+        _state.logs.add(LogStrings.nightNobodyDied(_locale, _state.nightCount));
       }
     } else {
-      _state.logs.add('Gece ${_state.nightCount}: Kimse ölmedi');
+      _state.logs.add(LogStrings.nightNobodyDied(_locale, _state.nightCount));
     }
 
     final winner = _state.checkWinCondition();
@@ -274,7 +275,7 @@ class GameProvider with ChangeNotifier {
       if (playerIndex != -1) {
         _state.players[playerIndex].isAlive = false;
         final playerName = _state.players[playerIndex].name;
-        _state.logs.add('Oylama: $playerName elendi');
+        _state.logs.add(LogStrings.voteEliminated(_locale, playerName));
       }
     }
 

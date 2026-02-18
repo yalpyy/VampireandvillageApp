@@ -72,7 +72,7 @@ class _VampirePartyAppState extends State<VampirePartyApp> {
           };
 
           return MaterialApp(
-            title: 'Vampir Partisi',
+            title: gameProvider.locale == 'en' ? 'Vampire Party' : 'Vampir Partisi',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.darkTheme,
             locale: Locale(gameProvider.locale),

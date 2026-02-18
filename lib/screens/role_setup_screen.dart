@@ -23,14 +23,14 @@ class RoleSetupScreen extends StatelessWidget {
           children: [
             // ── Header ─────────────────────────────
             GothicHeaderBanner(
-              title: 'ROL SE\u00C7\u0130M\u0130',
-              subtitle: 'OYUNCU SAYISI',
+              title: l.roleSelection,
+              subtitle: l.playerCount,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new,
                     color: GothicColors.goldPrimary, size: 20),
                 onPressed: () => Navigator.pop(context),
               ),
-              statusWidget: _buildStatusChip(playerCount, totalRoles, rolesMatch),
+              statusWidget: _buildStatusChip(playerCount, totalRoles, rolesMatch, l),
             ),
 
             // ── Warning if mismatch ────────────────
@@ -44,7 +44,7 @@ class RoleSetupScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // player count card
-                    _buildPlayerCountCard(playerCount, totalRoles, rolesMatch),
+                    _buildPlayerCountCard(playerCount, totalRoles, rolesMatch, l),
                     const SizedBox(height: 20),
 
                     // free roles
@@ -123,8 +123,8 @@ class RoleSetupScreen extends StatelessWidget {
             // ── Sticky CTA ────────────────────────
             StickyCtaBar(
               label: rolesMatch
-                  ? 'ROLLER\u0130 DA\u011eIT'
-                  : 'ROL SAYISI E\u015e\u0130T DE\u011e\u0130L',
+                  ? l.distributeRoles
+                  : l.roleCountMismatch,
               icon: rolesMatch ? Icons.play_arrow_rounded : Icons.block,
               enabled: rolesMatch,
               onTap: () {
@@ -140,7 +140,7 @@ class RoleSetupScreen extends StatelessWidget {
 
   // ── status chip inside header ──────────────────
 
-  Widget _buildStatusChip(int players, int roles, bool match) {
+  Widget _buildStatusChip(int players, int roles, bool match, LocalizationHelper l) {
     final color = match ? const Color(0xFF4ADE80) : const Color(0xFFFBBF24);
     final icon = match ? Icons.check_circle : Icons.info_outline;
     return Container(
@@ -156,7 +156,7 @@ class RoleSetupScreen extends StatelessWidget {
           Icon(icon, color: color, size: 14),
           const SizedBox(width: 6),
           Text(
-            '$players oyuncu / $roles rol',
+            l.playerAndRoleCount(players, roles),
             style: TextStyle(
               color: color,
               fontSize: 12,
@@ -204,12 +204,12 @@ class RoleSetupScreen extends StatelessWidget {
 
   // ── player count card ──────────────────────────
 
-  Widget _buildPlayerCountCard(int players, int roles, bool match) {
+  Widget _buildPlayerCountCard(int players, int roles, bool match, LocalizationHelper l) {
     return FramedPanel(
       child: Column(
         children: [
           Text(
-            'TOPLAM OYUNCU',
+            l.totalPlayers,
             style: TextStyle(
               color: GothicColors.goldPrimary.withOpacity(0.5),
               fontSize: 11,
@@ -229,7 +229,7 @@ class RoleSetupScreen extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            'Oyuncu',
+            l.player,
             style: TextStyle(
               color: GothicColors.goldPrimary.withOpacity(0.5),
               fontSize: 13,
@@ -241,7 +241,7 @@ class RoleSetupScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildCountPill('$players', 'Oyuncu',
+              _buildCountPill('$players', l.player,
                   GothicColors.goldPrimary.withOpacity(0.4)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -253,7 +253,7 @@ class RoleSetupScreen extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              _buildCountPill('$roles', 'Rol',
+              _buildCountPill('$roles', l.role,
                   match
                       ? const Color(0xFF4ADE80).withOpacity(0.3)
                       : const Color(0xFFEF4444).withOpacity(0.3)),

@@ -87,32 +87,19 @@ class _TermsScreenState extends State<TermsScreen> {
                 const SizedBox(height: 24),
                 // KVKK Section
                 _buildTermsCard(
-                  title: 'KVKK Aydinlatma Metni ve Gizlilik Politikasi',
-                  content:
-                      'Bu uygulama, 6698 sayili Kisisel Verilerin Korunmasi Kanunu (KVKK) kapsaminda kisisel verilerinizi islememektedir. Uygulama tamamen cevrimdisi calisir ve hicbir kisisel veri sunucularimiza gonderilmez.\n\n'
-                      'Reklam Hizmeti: Uygulama, Google AdMob reklam hizmeti kullanmaktadir. AdMob, reklam gosterimi amacli cihaz tanimlayicisi ve kullanim verisi toplayabilir. Bu veriler Google\'in gizlilik politikasi kapsaminda islenir.\n\n'
-                      'Uygulama Ici Satin Alimlar: Odeme islemleri yalnizca Apple App Store / Google Play tarafindan islenir. Odeme bilgileriniz tarafimizca gorulmez ve saklanmaz.\n\n'
-                      'Izleme Izni (iOS): iOS 14 ve uzeri cihazlarda, size daha uygun reklamlar gostermek icin izleme izni istenebilir. Bu izni reddedebilirsiniz; uygulama calismaya devam eder.\n\n'
-                      'Haklariniz: KVKK kapsaminda kisisel verilerinize erisim, duzeltme ve silme haklariniz bulunmaktadir.',
+                  title: l.kvkkTitle,
+                  content: l.kvkkContent,
                   isAccepted: _kvkkAccepted,
-                  checkboxLabel: 'KVKK Aydinlatma Metnini okudum ve anladim',
+                  checkboxLabel: l.kvkkAgreed,
                   onChanged: (v) => setState(() => _kvkkAccepted = v ?? false),
                 ),
                 const SizedBox(height: 16),
                 // Terms Section
                 _buildTermsCard(
-                  title: 'Kullanim Kosullari',
-                  content:
-                      'Bu uygulamayi kullanarak asagidaki kosullari kabul etmis olursunuz:\n\n'
-                      '- Uygulama yalnizca eglence amaclidir\n'
-                      '- Premium ozellikler tek seferlik satin alma ile acilir\n'
-                      '- Uygulama ici satin alimlar Apple/Google iade politikalarina tabidir\n'
-                      '- Uygulama icerisinde reklam gosterimi yapilmaktadir\n'
-                      '- Uygulama "oldugu gibi" sunulmaktadir\n'
-                      '- Gelistirici, uygulamanin kullanimindan dogabilecek zararlardan sorumlu degildir\n'
-                      '- Uygulama 12 yas ve uzeri kullanicilar icin uygundur',
+                  title: l.termsTitle,
+                  content: l.termsContent,
                   isAccepted: _termsAccepted,
-                  checkboxLabel: 'Kullanim Kosullarini kabul ediyorum',
+                  checkboxLabel: l.termsAgreed,
                   onChanged: (v) => setState(() => _termsAccepted = v ?? false),
                 ),
                 const SizedBox(height: 24),
@@ -139,7 +126,7 @@ class _TermsScreenState extends State<TermsScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        'KABUL ET VE DEVAM ET',
+                        l.acceptAndContinue,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

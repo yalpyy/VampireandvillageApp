@@ -42,8 +42,8 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
         child: Column(
           children: [
             GothicHeaderBanner(
-              title: 'OYUNCU SE\u00C7\u0130M\u0130',
-              subtitle: 'OYUNCU SAYISI',
+              title: l.playerSelection,
+              subtitle: l.playerCount,
               leading: Row(
                 children: [
                   IconButton(
@@ -69,14 +69,14 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Player count display
-                    _buildCountDisplay(players.length),
+                    _buildCountDisplay(players.length, l),
                     const SizedBox(height: 16),
                     // Add player input
                     _buildAddPlayerInput(l),
                     const SizedBox(height: 20),
                     // Player list
                     if (players.isNotEmpty) ...[
-                      _buildSectionLabel('OYUNCULAR'),
+                      _buildSectionLabel(l.players),
                       const SizedBox(height: 8),
                       FramedPanel(
                         padding: const EdgeInsets.symmetric(
@@ -113,13 +113,13 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
     );
   }
 
-  Widget _buildCountDisplay(int count) {
+  Widget _buildCountDisplay(int count, LocalizationHelper l) {
     final isValid = count >= 3;
     return FramedPanel(
       child: Column(
         children: [
           Text(
-            'TOPLAM OYUNCU',
+            l.totalPlayers,
             style: TextStyle(
               color: GothicColors.goldPrimary.withOpacity(0.5),
               fontSize: 12,
@@ -137,7 +137,7 @@ class _PlayerSetupScreenState extends State<PlayerSetupScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            isValid ? 'Oyuncu ekleyebilirsiniz' : 'En az 3 oyuncu gerekli',
+            isValid ? l.canAddPlayers : l.minimumPlayersRequired,
             style: TextStyle(
               color: isValid
                   ? const Color(0xFF4ADE80)

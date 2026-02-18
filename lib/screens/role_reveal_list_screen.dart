@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../utils/localization_helper.dart';
 import '../widgets/gothic_ui.dart';
 import 'role_reveal_screen.dart';
 
@@ -12,6 +13,7 @@ class RoleRevealListScreen extends StatelessWidget {
     final gameProvider = context.watch<GameProvider>();
     final players = gameProvider.players;
     final allRevealed = gameProvider.allPlayersRevealed;
+    final l = LocalizationHelper.of(context);
 
     return PopScope(
       canPop: false,
@@ -19,9 +21,9 @@ class RoleRevealListScreen extends StatelessWidget {
         body: GothicBackground(
           child: Column(
             children: [
-              const GothicHeaderBanner(
-                title: 'ROL DA\u011eITIMI',
-                subtitle: 'Rol\u00fcn\u00fc g\u00f6rmek i\u00e7in dokun',
+              GothicHeaderBanner(
+                title: l.roleDistribution,
+                subtitle: l.tapToSeeRole,
               ),
               Expanded(
                 child: SingleChildScrollView(
@@ -29,7 +31,7 @@ class RoleRevealListScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       // Info chip
-                      _buildInfoChip(players.length, gameProvider),
+                      _buildInfoChip(players.length, gameProvider, l),
                       const SizedBox(height: 16),
                       // Player list
                       FramedPanel(
@@ -59,14 +61,14 @@ class RoleRevealListScreen extends StatelessWidget {
               // Bottom CTA
               if (allRevealed)
                 StickyCtaBar(
-                  label: 'MODERAT\u00d6R EKRANINA GE\u00c7',
+                  label: l.goToModerator,
                   icon: Icons.admin_panel_settings,
                   onTap: () => Navigator.pushReplacementNamed(
                       context, '/moderator'),
                 )
               else
-                const StickyCtaBar(
-                  label: 'T\u00dcM OYUNCULAR G\u00d6RMEL\u0130',
+                StickyCtaBar(
+                  label: l.allPlayersMustSee,
                   enabled: false,
                 ),
             ],
@@ -76,7 +78,7 @@ class RoleRevealListScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoChip(int total, GameProvider gp) {
+  Widget _buildInfoChip(int total, GameProvider gp, LocalizationHelper l) {
     final seen =
         gp.players.where((p) => p.hasSeenRole).length;
     return Container(
@@ -88,7 +90,7 @@ class RoleRevealListScreen extends StatelessWidget {
             color: GothicColors.goldPrimary.withOpacity(0.2)),
       ),
       child: Text(
-        '$seen / $total oyuncu rol\u00fcn\u00fc g\u00f6rd\u00fc',
+        l.playersSawRole(seen, total),
         style: TextStyle(
           color: GothicColors.goldPrimary.withOpacity(0.7),
           fontSize: 13,
@@ -177,7 +179,7 @@ class RoleRevealListScreen extends StatelessWidget {
                   // Action
                   if (hasSeen)
                     Text(
-                      'G\u00f6r\u00fcld\u00fc',
+                      LocalizationHelper.of(context).seen,
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 12,
@@ -201,8 +203,8 @@ class RoleRevealListScreen extends StatelessWidget {
                               GothicColors.goldPrimary.withOpacity(0.3),
                         ),
                       ),
-                      child: const Text(
-                        'G\u00d6R',
+                      child: Text(
+                        LocalizationHelper.of(context).seeRole,
                         style: TextStyle(
                           color: GothicColors.goldLight,
                           fontSize: 12,

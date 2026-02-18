@@ -106,6 +106,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
   }
 
   void _showKillBottomSheet(String playerId, String playerName) {
+    final l = LocalizationHelper.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -136,7 +137,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
             const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 48),
             const SizedBox(height: AppTheme.spacingMd),
             Text(
-              '$playerName öldü mü?',
+              l.playerDiedQuestion(playerName),
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -145,7 +146,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
             ),
             const SizedBox(height: AppTheme.spacingXs),
             Text(
-              'Bu işlem geri alınamaz',
+              l.actionCannotBeUndone,
               style: TextStyle(color: Colors.white.withOpacity(0.5)),
             ),
             const SizedBox(height: AppTheme.spacingXl),
@@ -170,7 +171,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
                     Icon(Icons.close, size: 24),
                     SizedBox(width: AppTheme.spacingXs),
                     Text(
-                      'ÖLDÜR',
+                      l.killButton,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -194,8 +195,8 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
                   ),
                   side: BorderSide(color: Colors.white.withOpacity(0.2)),
                 ),
-                child: const Text(
-                  'İPTAL',
+                child: Text(
+                  l.cancel.toUpperCase(),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -363,8 +364,8 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
                   const SizedBox(width: AppTheme.spacingXs),
                   Text(
                     _isNight
-                        ? 'GECE ${gameProvider.state.nightCount + 1}'
-                        : 'GÜNDÜZ',
+                        ? l.nightLabel(gameProvider.state.nightCount + 1)
+                        : l.dayLabel,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -422,13 +423,13 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
             child: Column(
               children: [
                 if (_showTimesUp)
-                  const Row(
+                  Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.alarm, color: Colors.orange, size: 24),
-                      SizedBox(width: AppTheme.spacingXs),
+                      const Icon(Icons.alarm, color: Colors.orange, size: 24),
+                      const SizedBox(width: AppTheme.spacingXs),
                       Text(
-                        'SÜRE DOLDU!',
+                        l.timesUp,
                         style: TextStyle(
                           color: Colors.orange,
                           fontSize: 16,
@@ -689,6 +690,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
   }
 
   Widget _buildSleepButton() {
+    final l = LocalizationHelper.of(context);
     return ElevatedButton(
       onPressed: _putToSleep,
       style: ElevatedButton.styleFrom(
@@ -700,27 +702,28 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
         elevation: 6,
         shadowColor: AppTheme.darkPurple.withOpacity(0.5),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.nightlight_round, size: 26),
-          SizedBox(width: AppTheme.spacingSm),
+          const Icon(Icons.nightlight_round, size: 26),
+          const SizedBox(width: AppTheme.spacingSm),
           Text(
-            'HERKESİ UYUT',
+            l.putEveryoneToSleep,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
             ),
           ),
-          SizedBox(width: AppTheme.spacingXs),
-          Text('🐺', style: TextStyle(fontSize: 20)),
+          const SizedBox(width: AppTheme.spacingXs),
+          const Text('\u{1F43A}', style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
 
   Widget _buildWakeButton() {
+    final l = LocalizationHelper.of(context);
     return ElevatedButton(
       onPressed: _wakeUp,
       style: ElevatedButton.styleFrom(
@@ -732,27 +735,28 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
         elevation: 6,
         shadowColor: AppTheme.primaryRed.withOpacity(0.5),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.wb_sunny, size: 26),
-          SizedBox(width: AppTheme.spacingSm),
+          const Icon(Icons.wb_sunny, size: 26),
+          const SizedBox(width: AppTheme.spacingSm),
           Text(
-            'HERKESİ UYANDIR',
+            l.wakeEveryone,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
             ),
           ),
-          SizedBox(width: AppTheme.spacingXs),
-          Text('🐓', style: TextStyle(fontSize: 20)),
+          const SizedBox(width: AppTheme.spacingXs),
+          const Text('\u{1F413}', style: TextStyle(fontSize: 20)),
         ],
       ),
     );
   }
 
   void _showExitDialog(GameProvider gameProvider) {
+    final l = LocalizationHelper.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -760,18 +764,18 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         ),
-        title: const Text(
-          'Oyundan Çık',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          l.exitGame,
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'Oyundan çıkmak istediğinize emin misiniz? İlerleme kaydedilmeyecek.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          l.exitGameConfirmation,
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('İptal'),
+            child: Text(l.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -786,7 +790,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryRed,
             ),
-            child: const Text('Çık'),
+            child: Text(l.exit),
           ),
         ],
       ),

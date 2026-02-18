@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../utils/localization_helper.dart';
 import '../widgets/ad_banner_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
+    final l = LocalizationHelper.of(context);
 
     return Scaffold(
       body: Stack(
@@ -177,9 +179,9 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 const SizedBox(height: 10),
                 // OYUNA BASLA yazisi
-                const Text(
-                  'OYUNA',
-                  style: TextStyle(
+                Text(
+                  l.startGameLine1,
+                  style: const TextStyle(
                     color: goldLight,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -187,9 +189,9 @@ class _HomeScreenState extends State<HomeScreen>
                     height: 1.1,
                   ),
                 ),
-                const Text(
-                  'BAŞLA',
-                  style: TextStyle(
+                Text(
+                  l.startGameLine2,
+                  style: const TextStyle(
                     color: goldPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w900,

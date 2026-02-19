@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen>
           Positioned(
             bottom: gameProvider.adsEnabled ? 70 : 24,
             right: 16,
-            child: _buildStartButton(gameProvider),
+            child: _buildStartButton(gameProvider, l),
           ),
           // Banner reklam - en altta
           if (gameProvider.adsEnabled)
@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildStartButton(GameProvider gameProvider) {
+  Widget _buildStartButton(GameProvider gameProvider, LocalizationHelper l) {
     return AnimatedBuilder(
       animation: _glowAnimation,
       builder: (context, child) {

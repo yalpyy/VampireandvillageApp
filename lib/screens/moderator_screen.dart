@@ -165,14 +165,14 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
                     borderRadius: BorderRadius.circular(AppTheme.radiusMd),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.close, size: 24),
-                    SizedBox(width: AppTheme.spacingXs),
+                    const Icon(Icons.close, size: 24),
+                    const SizedBox(width: AppTheme.spacingXs),
                     Text(
                       l.killButton,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
@@ -272,7 +272,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
                 // App bar
                 _buildAppBar(gameProvider, l),
                 // Timer section
-                _buildTimerSection(),
+                _buildTimerSection(l),
                 // Timer presets
                 _buildTimerPresets(),
                 // Player list
@@ -397,7 +397,7 @@ class _ModeratorScreenState extends State<ModeratorScreen> {
     );
   }
 
-  Widget _buildTimerSection() {
+  Widget _buildTimerSection(LocalizationHelper l) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: AppTheme.spacingMd),
       child: Column(

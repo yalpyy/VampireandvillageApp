@@ -138,7 +138,7 @@ class AppTheme {
           side: BorderSide(color: goldPrimary.withOpacity(0.2)),
         ),
       ),
-      dialogTheme: DialogThemeData(
+      dialogTheme: DialogTheme(
         backgroundColor: cardBg,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusLg),
